@@ -3,7 +3,7 @@ import { useStore } from '../store'
 import type { Task } from '../../../shared/types'
 
 const DAY_WIDTH = 80
-const HEADER_HEIGHT = 40
+const HEADER_HEIGHT = 56
 const BLOCK_HEIGHT = 32
 const BLOCK_GAP = 8
 const ROW_OFFSET = 60
@@ -222,7 +222,7 @@ export function TimeCanvas() {
   const projectColor = (pid: number | null) =>
     projects.find((p) => p.id === pid)?.color ?? '#4b5563'
 
-  const renderBlock = (task: Task, startKey: keyof Task, endKey: keyof Task, rowMap: Map<number, number>, rowOffset: number = 0, opacity: number = 1) => {
+  const renderBlock = (task: Task, startKey: keyof Task, endKey: keyof Task, rowMap: Map<number, number>, rowOffset: number = 0) => {
     const isPlanned = startKey === 'planned_start'
     return (
       <div
@@ -232,10 +232,9 @@ export function TimeCanvas() {
         }`}
         style={{
           ...getTaskStyle(task, startKey, endKey, rowMap, rowOffset),
-          backgroundColor: projectColor(task.project_id) + (isPlanned && canvasMode === 'both' ? '15' : '33'),
-          borderColor: projectColor(task.project_id) + (isPlanned && canvasMode === 'both' ? '25' : '66'),
+          backgroundColor: projectColor(task.project_id) + (isPlanned ? '26' : 'ff'),
+          borderColor: projectColor(task.project_id) + (isPlanned ? '40' : 'ff'),
           color: isPlanned ? '#141413' : '#faf9f5',
-          opacity: opacity,
         }}
         onMouseDown={isPlanned ? (e) => handleMouseDown(e, task, 'move') : undefined}
         onDoubleClick={() => setEditingTaskId(task.id)}
@@ -243,7 +242,7 @@ export function TimeCanvas() {
         <span>{task.title}</span>
         {isPlanned && (
           <div
-            className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black/10"
+            className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-[#141413]/10"
             onMouseDown={(e) => {
               e.stopPropagation()
               handleMouseDown(e, task, 'resize')
@@ -277,7 +276,7 @@ export function TimeCanvas() {
                   {d.toLocaleDateString('en-US', { weekday: 'narrow' })}
                 </span>
                 <span
-                  className={`text-sm font-medium ${
+                  className={`text-[15px] font-medium ${
                     d.getTime() === now.getTime() ? 'text-[#c96442]' : 'text-[#141413]'
                   }`}
                 >
@@ -294,12 +293,12 @@ export function TimeCanvas() {
         </div>
 
         {/* Mode toggle */}
-        <div className="flex gap-1 px-2 py-2 border-b border-[#f0eee6] bg-[#faf9f5] sticky top-[40px] z-10">
+        <div className="flex gap-1 px-2 py-2 border-b border-[#f0eee6] bg-[#faf9f5] sticky top-[56px] z-10">
           {(['plan', 'actual', 'both'] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => setCanvasMode(mode)}
-              className={`px-3 py-1 text-xs rounded-md capitalize transition-colors ${
+              className={`px-3 py-1 text-xs rounded-lg capitalize transition-colors ${
                 canvasMode === mode
                   ? 'bg-[#141413] text-[#faf9f5]'
                   : 'text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed]'
@@ -364,7 +363,7 @@ export function TimeCanvas() {
           {/* Planned blocks */}
           {(canvasMode === 'plan' || canvasMode === 'both') &&
             plannedTasks.map((task) =>
-              renderBlock(task, 'planned_start', 'planned_end', plannedRows, 0, canvasMode === 'both' ? 0.4 : 1)
+              renderBlock(task, 'planned_start', 'planned_end', plannedRows, 0)
             )}
 
           {/* Actual blocks */}
@@ -375,8 +374,7 @@ export function TimeCanvas() {
                 'actual_start',
                 'actual_end',
                 actualRows,
-                canvasMode === 'both' ? maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP) + 20 : 0,
-                1
+                canvasMode === 'both' ? maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP) + 20 : 0
               )
             )}
 

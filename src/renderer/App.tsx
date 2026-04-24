@@ -18,7 +18,7 @@ export default function App() {
       {/* Left sidebar */}
       <aside className="w-64 flex-shrink-0 border-r border-[#f0eee6] flex flex-col bg-[#faf9f5]">
         <div className="p-4 border-b border-[#f0eee6]">
-          <h1 className="text-lg font-semibold tracking-tight">TM</h1>
+          <h1 className="font-[Georgia] text-[28px] font-medium text-[#141413]">TM</h1>
         </div>
         <ProjectList />
         <div className="border-t border-[#f0eee6]" />
@@ -34,7 +34,7 @@ export default function App() {
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`px-3 py-1.5 rounded-md text-sm capitalize transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-sm capitalize transition-colors ${
                   view === v
                     ? 'bg-[#141413] text-[#faf9f5]'
                     : 'text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed]'
@@ -56,7 +56,7 @@ export default function App() {
               a.click()
               URL.revokeObjectURL(url)
             }}
-            className="px-3 py-1.5 text-sm text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed] border border-[#e8e6dc] rounded-md transition-colors"
+            className="px-3 py-1.5 text-sm text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed] border border-[#e8e6dc] rounded-lg transition-colors"
           >
             Export JSON
           </button>
