@@ -63,7 +63,7 @@ export default function App() {
           <input
             type="text"
             placeholder="Search..."
-            className="w-48 px-3 py-1.5 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
+            className="w-48 px-3 py-1.5 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#9a9890]"
           />
         </header>
 
