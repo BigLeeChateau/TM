@@ -17,11 +17,11 @@ export default function App() {
     <div className="flex h-full bg-[#f5f4ed] text-[#141413]">
       {/* Left sidebar */}
       <aside className="w-64 flex-shrink-0 border-r border-[#f0eee6] flex flex-col bg-[#faf9f5]">
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b border-[#f0eee6]">
           <h1 className="text-lg font-semibold tracking-tight">TM</h1>
         </div>
         <ProjectList />
-        <div className="border-t border-gray-800" />
+        <div className="border-t border-[#f0eee6]" />
         <TaskList />
       </aside>
 
@@ -99,7 +99,7 @@ function ListView() {
           >
             <StatusBadge status={task.status} />
             <span className="flex-1">{task.title}</span>
-            <span className="text-xs text-gray-500">{getProjectName(task.project_id)}</span>
+            <span className="text-xs text-[#87867f]">{getProjectName(task.project_id)}</span>
           </div>
         ))}
       </div>
@@ -128,7 +128,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="bg-white border border-[#f0eee6] rounded-lg p-4">
       <div className="text-2xl font-semibold">{value}</div>
-      <div className="text-sm text-gray-500">{label}</div>
+      <div className="text-sm text-[#87867f]">{label}</div>
     </div>
   )
 }
@@ -141,6 +141,6 @@ function StatusBadge({ status }: { status: string }) {
     done: 'bg-[#4d4c48]',
   }
   return (
-    <span className={`w-2 h-2 rounded-full ${colors[status] || 'bg-gray-700'}`} />
+    <span className={`w-2 h-2 rounded-full ${colors[status] || 'bg-[#5e5d59]'}`} />
   )
 }
