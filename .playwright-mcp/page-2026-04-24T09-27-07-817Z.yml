@@ -1,0 +1,167 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - heading "TM" [level=1] [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]: Projects
+      - generic [ref=e9]:
+        - button "Test Project" [ref=e10] [cursor=pointer]:
+          - generic [ref=e12]: Test Project
+        - button "+ New Project" [ref=e144] [cursor=pointer]:
+          - generic [ref=e145]: +
+          - generic [ref=e146]: New Project
+    - generic [ref=e17]:
+      - generic [ref=e18]: GTD
+      - generic [ref=e19]:
+        - button "All Tasks" [ref=e20] [cursor=pointer]:
+          - generic [ref=e21]: All Tasks
+        - button "Inbox 1" [ref=e148] [cursor=pointer]:
+          - generic [ref=e23]: Inbox
+          - generic [ref=e24]: "1"
+        - button "Next 0" [ref=e25] [cursor=pointer]:
+          - generic [ref=e26]: Next
+          - generic [ref=e27]: "0"
+        - button "Waiting 0" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Waiting
+          - generic [ref=e30]: "0"
+        - button "Done 0" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32]: Done
+          - generic [ref=e33]: "0"
+      - generic [ref=e34]:
+        - generic [ref=e149]:
+          - button [ref=e150] [cursor=pointer]
+          - generic [ref=e151] [cursor=pointer]: Overcommit test task
+          - button "×" [ref=e152] [cursor=pointer]
+        - button "+ New Task" [ref=e153] [cursor=pointer]:
+          - generic [ref=e154]: +
+          - generic [ref=e155]: New Task
+  - main [ref=e38]:
+    - generic [ref=e39]:
+      - navigation [ref=e40]:
+        - button "canvas" [ref=e41] [cursor=pointer]
+        - button "list" [ref=e42] [cursor=pointer]
+        - button "dashboard" [ref=e43] [cursor=pointer]
+      - button "Export JSON" [ref=e44] [cursor=pointer]
+      - textbox "Search..." [ref=e45]
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]: T
+          - generic [ref=e52]: "21"
+        - generic [ref=e53]:
+          - generic [ref=e54]: W
+          - generic [ref=e55]: "22"
+        - generic [ref=e56]:
+          - generic [ref=e57]: T
+          - generic [ref=e58]: "23"
+        - generic [ref=e59]:
+          - generic [ref=e60]: F
+          - generic [ref=e61]: "24"
+        - generic [ref=e62]:
+          - generic [ref=e63]: S
+          - generic [ref=e64]: "25"
+        - generic [ref=e65]:
+          - generic [ref=e66]: S
+          - generic [ref=e67]: "26"
+        - generic [ref=e68]:
+          - generic [ref=e69]: M
+          - generic [ref=e70]: "27"
+        - generic [ref=e71]:
+          - generic [ref=e72]: T
+          - generic [ref=e73]: "28"
+        - generic [ref=e74]:
+          - generic [ref=e75]: W
+          - generic [ref=e76]: "29"
+        - generic [ref=e77]:
+          - generic [ref=e78]: T
+          - generic [ref=e79]: "30"
+        - generic [ref=e80]:
+          - generic [ref=e81]: F
+          - generic [ref=e82]: "1"
+        - generic [ref=e83]:
+          - generic [ref=e84]: S
+          - generic [ref=e85]: "2"
+        - generic [ref=e86]:
+          - generic [ref=e87]: S
+          - generic [ref=e88]: "3"
+        - generic [ref=e89]:
+          - generic [ref=e90]: M
+          - generic [ref=e91]: "4"
+        - generic [ref=e92]:
+          - generic [ref=e93]: T
+          - generic [ref=e94]: "5"
+        - generic [ref=e95]:
+          - generic [ref=e96]: W
+          - generic [ref=e97]: "6"
+        - generic [ref=e98]:
+          - generic [ref=e99]: T
+          - generic [ref=e100]: "7"
+        - generic [ref=e101]:
+          - generic [ref=e102]: F
+          - generic [ref=e103]: "8"
+        - generic [ref=e104]:
+          - generic [ref=e105]: S
+          - generic [ref=e106]: "9"
+        - generic [ref=e107]:
+          - generic [ref=e108]: S
+          - generic [ref=e109]: "10"
+        - generic [ref=e110]:
+          - generic [ref=e111]: M
+          - generic [ref=e112]: "11"
+      - generic [ref=e113]:
+        - button "plan" [ref=e114] [cursor=pointer]
+        - button "actual" [ref=e115] [cursor=pointer]
+        - button "Plan + Actual" [ref=e116] [cursor=pointer]
+      - generic [ref=e117]:
+        - generic [ref=e118]: Inbox / Unscheduled
+        - generic [ref=e157]: Overcommit test task
+  - generic [ref=e159]:
+    - heading "Edit Task" [level=3] [ref=e160]
+    - generic [ref=e161]:
+      - generic [ref=e162]:
+        - generic [ref=e163]: Title
+        - textbox [active] [ref=e164]: Overcommit test task
+      - generic [ref=e165]:
+        - generic [ref=e166]: Description
+        - textbox [ref=e167]
+      - generic [ref=e168]:
+        - generic [ref=e169]:
+          - generic [ref=e170]: Status
+          - combobox [ref=e171]:
+            - option "Inbox" [selected]
+            - option "Next"
+            - option "Waiting"
+            - option "Done"
+        - generic [ref=e172]:
+          - generic [ref=e173]: Project
+          - combobox [ref=e174]:
+            - option "None" [selected]
+            - option "Test Project"
+      - generic [ref=e175]:
+        - generic [ref=e176]:
+          - generic [ref=e177]: Planned Start
+          - textbox [ref=e178]
+        - generic [ref=e179]:
+          - generic [ref=e180]: Planned End
+          - textbox [ref=e181]
+        - generic [ref=e182]:
+          - generic [ref=e183]: Hours
+          - spinbutton [ref=e184]
+      - generic [ref=e185]:
+        - generic [ref=e186]:
+          - generic [ref=e187]: Actual Time
+          - button "Start now" [ref=e189] [cursor=pointer]
+        - generic [ref=e190]:
+          - generic [ref=e191]:
+            - generic [ref=e192]: Actual Start
+            - textbox [ref=e193]
+          - generic [ref=e194]:
+            - generic [ref=e195]: Actual End
+            - textbox [ref=e196]
+          - generic [ref=e197]:
+            - generic [ref=e198]: Hours
+            - spinbutton [ref=e199]
+    - generic [ref=e200]:
+      - button "Delete" [ref=e201] [cursor=pointer]
+      - generic [ref=e202]:
+        - button "Cancel" [ref=e203] [cursor=pointer]
+        - button "Save" [ref=e204] [cursor=pointer]

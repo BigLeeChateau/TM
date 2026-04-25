@@ -1,0 +1,18 @@
+[      36ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:20354
+[  149520ms] TypeError: plannedRows.get is not a function
+    at http://localhost:5178/src/renderer/components/TimeCanvas.tsx:74:99
+    at Array.map (<anonymous>)
+    at TimeCanvas (http://localhost:5178/src/renderer/components/TimeCanvas.tsx:74:76)
+    at Object.react_stack_bottom_frame (http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:18761:20)
+    at renderWithHooks (http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:5906:24)
+    at updateFunctionComponent (http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:7727:21)
+    at beginWork (http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:8777:20)
+    at runWithFiberInDEV (http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:1249:72)
+    at performUnitOfWork (http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:12813:98)
+    at workLoopSync (http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:12676:43)
+[  149520ms] [WARNING] %s
+
+%s
+ An error occurred in the <TimeCanvas> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:7217
+[  387940ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5178/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:20354

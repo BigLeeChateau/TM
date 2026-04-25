@@ -1,0 +1,136 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - heading "TM" [level=1] [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]: Projects
+      - generic [ref=e9]:
+        - button "Website Redesign" [ref=e10] [cursor=pointer]:
+          - generic [ref=e12]: Website Redesign
+        - button "Mobile App" [ref=e13] [cursor=pointer]:
+          - generic [ref=e15]: Mobile App
+        - button "Other" [ref=e16] [cursor=pointer]:
+          - generic [ref=e18]: Other
+        - button "+ New Project" [ref=e19] [cursor=pointer]:
+          - generic [ref=e20]: +
+          - generic [ref=e21]: New Project
+    - generic [ref=e23]:
+      - generic [ref=e24]: GTD
+      - generic [ref=e25]:
+        - button "All Tasks" [ref=e26] [cursor=pointer]:
+          - generic [ref=e27]: All Tasks
+        - button "Inbox 1" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Inbox
+          - generic [ref=e30]: "1"
+        - button "Next 1" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32]: Next
+          - generic [ref=e33]: "1"
+        - button "Waiting 1" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: Waiting
+          - generic [ref=e36]: "1"
+        - button "Done 1" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: Done
+          - generic [ref=e39]: "1"
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - button [ref=e42] [cursor=pointer]
+          - generic [ref=e43] [cursor=pointer]: Homepage mockups
+          - button "×" [ref=e45] [cursor=pointer]
+        - generic [ref=e46]:
+          - button [ref=e47] [cursor=pointer]
+          - generic [ref=e48] [cursor=pointer]: API integration
+          - button "×" [ref=e50] [cursor=pointer]
+        - generic [ref=e51]:
+          - button [ref=e52] [cursor=pointer]
+          - generic [ref=e53] [cursor=pointer]: User research
+          - button "×" [ref=e55] [cursor=pointer]
+        - generic [ref=e56]:
+          - button [ref=e57] [cursor=pointer]
+          - generic [ref=e58] [cursor=pointer]: Draft copy
+          - button "×" [ref=e59] [cursor=pointer]
+        - button "+ New Task" [ref=e60] [cursor=pointer]:
+          - generic [ref=e61]: +
+          - generic [ref=e62]: New Task
+  - main [ref=e63]:
+    - generic [ref=e64]:
+      - navigation [ref=e65]:
+        - button "canvas" [ref=e66] [cursor=pointer]
+        - button "list" [ref=e67] [cursor=pointer]
+        - button "dashboard" [ref=e68] [cursor=pointer]
+      - button "Export JSON" [ref=e69] [cursor=pointer]
+      - textbox "Search..." [ref=e70]
+    - generic [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - generic [ref=e76]: W
+          - generic [ref=e77]: "22"
+        - generic [ref=e78]:
+          - generic [ref=e79]: T
+          - generic [ref=e80]: "23"
+        - generic [ref=e81]:
+          - generic [ref=e82]: F
+          - generic [ref=e83]: "24"
+        - generic [ref=e84]:
+          - generic [ref=e85]: S
+          - generic [ref=e86]: "25"
+        - generic [ref=e87]:
+          - generic [ref=e88]: S
+          - generic [ref=e89]: "26"
+        - generic [ref=e90]:
+          - generic [ref=e91]: M
+          - generic [ref=e92]: "27"
+        - generic [ref=e93]:
+          - generic [ref=e94]: T
+          - generic [ref=e95]: "28"
+        - generic [ref=e96]:
+          - generic [ref=e97]: W
+          - generic [ref=e98]: "29"
+        - generic [ref=e99]:
+          - generic [ref=e100]: T
+          - generic [ref=e101]: "30"
+        - generic [ref=e102]:
+          - generic [ref=e103]: F
+          - generic [ref=e104]: "1"
+        - generic [ref=e105]:
+          - generic [ref=e106]: S
+          - generic [ref=e107]: "2"
+        - generic [ref=e108]:
+          - generic [ref=e109]: S
+          - generic [ref=e110]: "3"
+        - generic [ref=e111]:
+          - generic [ref=e112]: M
+          - generic [ref=e113]: "4"
+        - generic [ref=e114]:
+          - generic [ref=e115]: T
+          - generic [ref=e116]: "5"
+        - generic [ref=e117]:
+          - generic [ref=e118]: W
+          - generic [ref=e119]: "6"
+        - generic [ref=e120]:
+          - generic [ref=e121]: T
+          - generic [ref=e122]: "7"
+        - generic [ref=e123]:
+          - generic [ref=e124]: F
+          - generic [ref=e125]: "8"
+        - generic [ref=e126]:
+          - generic [ref=e127]: S
+          - generic [ref=e128]: "9"
+        - generic [ref=e129]:
+          - generic [ref=e130]: S
+          - generic [ref=e131]: "10"
+        - generic [ref=e132]:
+          - generic [ref=e133]: M
+          - generic [ref=e134]: "11"
+        - generic [ref=e135]:
+          - generic [ref=e136]: T
+          - generic [ref=e137]: "12"
+      - generic [ref=e138]:
+        - button "plan" [ref=e139] [cursor=pointer]
+        - button "actual" [ref=e140] [cursor=pointer]
+        - button "Plan + Actual" [ref=e141] [cursor=pointer]
+      - generic [ref=e142]:
+        - generic [ref=e143]: Inbox / Unscheduled
+        - generic [ref=e145]: Draft copy
+      - generic [ref=e146]:
+        - generic [ref=e169]: Homepage mockups
+        - generic [ref=e171]: API integration
+        - generic [ref=e173]: User research

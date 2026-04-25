@@ -1,0 +1,116 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - heading "TM" [level=1] [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]: Projects
+      - generic [ref=e9]:
+        - button "Other" [ref=e10] [cursor=pointer]:
+          - generic [ref=e12]: Other
+        - button "+ New Project" [ref=e13] [cursor=pointer]:
+          - generic [ref=e14]: +
+          - generic [ref=e15]: New Project
+    - generic [ref=e17]:
+      - generic [ref=e18]: GTD
+      - generic [ref=e19]:
+        - button "All Tasks" [ref=e20] [cursor=pointer]:
+          - generic [ref=e21]: All Tasks
+        - button "Inbox 0" [ref=e202] [cursor=pointer]:
+          - generic [ref=e23]: Inbox
+          - generic [ref=e24]: "0"
+        - button "Next 1" [ref=e203] [cursor=pointer]:
+          - generic [ref=e26]: Next
+          - generic [ref=e27]: "1"
+        - button "Waiting 0" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Waiting
+          - generic [ref=e30]: "0"
+        - button "Done 0" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32]: Done
+          - generic [ref=e33]: "0"
+      - generic [ref=e34]:
+        - generic [ref=e144]:
+          - button [ref=e145] [cursor=pointer]
+          - generic [ref=e146] [cursor=pointer]: Test task without project
+          - button "×" [ref=e148] [cursor=pointer]
+        - button "+ New Task" [ref=e149] [cursor=pointer]:
+          - generic [ref=e150]: +
+          - generic [ref=e151]: New Task
+  - main [ref=e38]:
+    - generic [ref=e39]:
+      - navigation [ref=e40]:
+        - button "canvas" [ref=e41] [cursor=pointer]
+        - button "list" [ref=e42] [cursor=pointer]
+        - button "dashboard" [ref=e43] [cursor=pointer]
+      - button "Export JSON" [ref=e44] [cursor=pointer]
+      - textbox "Search..." [ref=e45]
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]: W
+          - generic [ref=e52]: "22"
+        - generic [ref=e53]:
+          - generic [ref=e54]: T
+          - generic [ref=e55]: "23"
+        - generic [ref=e56]:
+          - generic [ref=e57]: F
+          - generic [ref=e58]: "24"
+        - generic [ref=e59]:
+          - generic [ref=e60]: S
+          - generic [ref=e61]: "25"
+        - generic [ref=e62]:
+          - generic [ref=e63]: S
+          - generic [ref=e64]: "26"
+        - generic [ref=e65]:
+          - generic [ref=e66]: M
+          - generic [ref=e67]: "27"
+        - generic [ref=e68]:
+          - generic [ref=e69]: T
+          - generic [ref=e70]: "28"
+        - generic [ref=e71]:
+          - generic [ref=e72]: W
+          - generic [ref=e73]: "29"
+        - generic [ref=e74]:
+          - generic [ref=e75]: T
+          - generic [ref=e76]: "30"
+        - generic [ref=e77]:
+          - generic [ref=e78]: F
+          - generic [ref=e79]: "1"
+        - generic [ref=e80]:
+          - generic [ref=e81]: S
+          - generic [ref=e82]: "2"
+        - generic [ref=e83]:
+          - generic [ref=e84]: S
+          - generic [ref=e85]: "3"
+        - generic [ref=e86]:
+          - generic [ref=e87]: M
+          - generic [ref=e88]: "4"
+        - generic [ref=e89]:
+          - generic [ref=e90]: T
+          - generic [ref=e91]: "5"
+        - generic [ref=e92]:
+          - generic [ref=e93]: W
+          - generic [ref=e94]: "6"
+        - generic [ref=e95]:
+          - generic [ref=e96]: T
+          - generic [ref=e97]: "7"
+        - generic [ref=e98]:
+          - generic [ref=e99]: F
+          - generic [ref=e100]: "8"
+        - generic [ref=e101]:
+          - generic [ref=e102]: S
+          - generic [ref=e103]: "9"
+        - generic [ref=e104]:
+          - generic [ref=e105]: S
+          - generic [ref=e106]: "10"
+        - generic [ref=e107]:
+          - generic [ref=e108]: M
+          - generic [ref=e109]: "11"
+        - generic [ref=e110]:
+          - generic [ref=e111]: T
+          - generic [ref=e112]: "12"
+      - generic [ref=e113]:
+        - button "plan" [ref=e114] [cursor=pointer]
+        - button "actual" [ref=e115] [cursor=pointer]
+        - button "Plan + Actual" [ref=e116] [cursor=pointer]
+      - generic [ref=e117]:
+        - generic [ref=e118]: Inbox / Unscheduled
+        - generic [ref=e153]: Test task without project

@@ -1,0 +1,110 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - heading "TM" [level=1] [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]: Projects
+      - generic [ref=e9]:
+        - button "Test Project" [ref=e10] [cursor=pointer]:
+          - generic [ref=e12]: Test Project
+        - button "+ New Project" [ref=e13] [cursor=pointer]:
+          - generic [ref=e14]: +
+          - generic [ref=e15]: New Project
+    - generic [ref=e17]:
+      - generic [ref=e18]: GTD
+      - generic [ref=e19]:
+        - button "All Tasks" [ref=e20] [cursor=pointer]:
+          - generic [ref=e21]: All Tasks
+        - button "Inbox 1" [ref=e22] [cursor=pointer]:
+          - generic [ref=e23]: Inbox
+          - generic [ref=e24]: "1"
+        - button "Next 0" [ref=e25] [cursor=pointer]:
+          - generic [ref=e26]: Next
+          - generic [ref=e27]: "0"
+        - button "Waiting 0" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Waiting
+          - generic [ref=e30]: "0"
+        - button "Done 0" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32]: Done
+          - generic [ref=e33]: "0"
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - button [ref=e36] [cursor=pointer]
+          - generic [ref=e37] [cursor=pointer]: Test task for canvas
+          - button "×" [ref=e38] [cursor=pointer]
+        - button "+ New Task" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40]: +
+          - generic [ref=e41]: New Task
+  - main [ref=e42]:
+    - generic [ref=e43]:
+      - navigation [ref=e44]:
+        - button "canvas" [ref=e45] [cursor=pointer]
+        - button "list" [ref=e46] [cursor=pointer]
+        - button "dashboard" [ref=e47] [cursor=pointer]
+      - textbox "Search..." [ref=e48]
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]: T
+          - generic [ref=e55]: "21"
+        - generic [ref=e56]:
+          - generic [ref=e57]: W
+          - generic [ref=e58]: "22"
+        - generic [ref=e59]:
+          - generic [ref=e60]: T
+          - generic [ref=e61]: "23"
+        - generic [ref=e62]:
+          - generic [ref=e63]: F
+          - generic [ref=e64]: "24"
+        - generic [ref=e65]:
+          - generic [ref=e66]: S
+          - generic [ref=e67]: "25"
+        - generic [ref=e68]:
+          - generic [ref=e69]: S
+          - generic [ref=e70]: "26"
+        - generic [ref=e71]:
+          - generic [ref=e72]: M
+          - generic [ref=e73]: "27"
+        - generic [ref=e74]:
+          - generic [ref=e75]: T
+          - generic [ref=e76]: "28"
+        - generic [ref=e77]:
+          - generic [ref=e78]: W
+          - generic [ref=e79]: "29"
+        - generic [ref=e80]:
+          - generic [ref=e81]: T
+          - generic [ref=e82]: "30"
+        - generic [ref=e83]:
+          - generic [ref=e84]: F
+          - generic [ref=e85]: "1"
+        - generic [ref=e86]:
+          - generic [ref=e87]: S
+          - generic [ref=e88]: "2"
+        - generic [ref=e89]:
+          - generic [ref=e90]: S
+          - generic [ref=e91]: "3"
+        - generic [ref=e92]:
+          - generic [ref=e93]: M
+          - generic [ref=e94]: "4"
+        - generic [ref=e95]:
+          - generic [ref=e96]: T
+          - generic [ref=e97]: "5"
+        - generic [ref=e98]:
+          - generic [ref=e99]: W
+          - generic [ref=e100]: "6"
+        - generic [ref=e101]:
+          - generic [ref=e102]: T
+          - generic [ref=e103]: "7"
+        - generic [ref=e104]:
+          - generic [ref=e105]: F
+          - generic [ref=e106]: "8"
+        - generic [ref=e107]:
+          - generic [ref=e108]: S
+          - generic [ref=e109]: "9"
+        - generic [ref=e110]:
+          - generic [ref=e111]: S
+          - generic [ref=e112]: "10"
+        - generic [ref=e113]:
+          - generic [ref=e114]: M
+          - generic [ref=e115]: "11"
+      - generic [ref=e117]: Inbox / Unscheduled
+      - generic [ref=e141]: Test task for canvas

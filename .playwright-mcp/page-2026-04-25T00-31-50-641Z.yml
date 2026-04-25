@@ -1,0 +1,111 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - heading "TM" [level=1] [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]: Projects
+      - textbox "Project name" [active] [ref=e140]
+    - generic [ref=e14]:
+      - generic [ref=e15]: GTD
+      - generic [ref=e16]:
+        - button "All Tasks" [ref=e17] [cursor=pointer]:
+          - generic [ref=e18]: All Tasks
+        - button "Inbox 1" [ref=e141] [cursor=pointer]:
+          - generic [ref=e20]: Inbox
+          - generic [ref=e21]: "1"
+        - button "Next 0" [ref=e22] [cursor=pointer]:
+          - generic [ref=e23]: Next
+          - generic [ref=e24]: "0"
+        - button "Waiting 0" [ref=e25] [cursor=pointer]:
+          - generic [ref=e26]: Waiting
+          - generic [ref=e27]: "0"
+        - button "Done 0" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Done
+          - generic [ref=e30]: "0"
+      - generic [ref=e31]:
+        - generic [ref=e142]:
+          - button [ref=e143] [cursor=pointer]
+          - generic [ref=e144] [cursor=pointer]: test
+          - button "×" [ref=e145] [cursor=pointer]
+        - button "+ New Task" [ref=e146] [cursor=pointer]:
+          - generic [ref=e147]: +
+          - generic [ref=e148]: New Task
+  - main [ref=e35]:
+    - generic [ref=e36]:
+      - navigation [ref=e37]:
+        - button "canvas" [ref=e38] [cursor=pointer]
+        - button "list" [ref=e39] [cursor=pointer]
+        - button "dashboard" [ref=e40] [cursor=pointer]
+      - button "Export JSON" [ref=e41] [cursor=pointer]
+      - textbox "Search..." [ref=e42]
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - generic [ref=e152]:
+          - generic [ref=e153]: W
+          - generic [ref=e154]: "22"
+        - generic [ref=e155]:
+          - generic [ref=e156]: T
+          - generic [ref=e157]: "23"
+        - generic [ref=e158]:
+          - generic [ref=e159]: F
+          - generic [ref=e160]: "24"
+        - generic [ref=e161]:
+          - generic [ref=e162]: S
+          - generic [ref=e163]: "25"
+        - generic [ref=e164]:
+          - generic [ref=e165]: S
+          - generic [ref=e166]: "26"
+        - generic [ref=e167]:
+          - generic [ref=e168]: M
+          - generic [ref=e169]: "27"
+        - generic [ref=e170]:
+          - generic [ref=e171]: T
+          - generic [ref=e172]: "28"
+        - generic [ref=e173]:
+          - generic [ref=e174]: W
+          - generic [ref=e175]: "29"
+        - generic [ref=e176]:
+          - generic [ref=e177]: T
+          - generic [ref=e178]: "30"
+        - generic [ref=e179]:
+          - generic [ref=e180]: F
+          - generic [ref=e181]: "1"
+        - generic [ref=e182]:
+          - generic [ref=e183]: S
+          - generic [ref=e184]: "2"
+        - generic [ref=e185]:
+          - generic [ref=e186]: S
+          - generic [ref=e187]: "3"
+        - generic [ref=e188]:
+          - generic [ref=e189]: M
+          - generic [ref=e190]: "4"
+        - generic [ref=e191]:
+          - generic [ref=e192]: T
+          - generic [ref=e193]: "5"
+        - generic [ref=e194]:
+          - generic [ref=e195]: W
+          - generic [ref=e196]: "6"
+        - generic [ref=e197]:
+          - generic [ref=e198]: T
+          - generic [ref=e199]: "7"
+        - generic [ref=e200]:
+          - generic [ref=e201]: F
+          - generic [ref=e202]: "8"
+        - generic [ref=e203]:
+          - generic [ref=e204]: S
+          - generic [ref=e205]: "9"
+        - generic [ref=e206]:
+          - generic [ref=e207]: S
+          - generic [ref=e208]: "10"
+        - generic [ref=e209]:
+          - generic [ref=e210]: M
+          - generic [ref=e211]: "11"
+        - generic [ref=e212]:
+          - generic [ref=e213]: T
+          - generic [ref=e214]: "12"
+      - generic [ref=e215]:
+        - button "plan" [ref=e216] [cursor=pointer]
+        - button "actual" [ref=e217] [cursor=pointer]
+        - button "Plan + Actual" [ref=e218] [cursor=pointer]
+      - generic [ref=e219]:
+        - generic [ref=e220]: Inbox / Unscheduled
+        - generic [ref=e222]: test

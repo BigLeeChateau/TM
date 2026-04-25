@@ -1,0 +1,5 @@
+[      40ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5176/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:20354
+[   10254ms] [LOG] handleMouseUp called {dragState: Object} @ http://localhost:5176/src/renderer/components/TimeCanvas.tsx?t=1777019020231:94
+[   10260ms] [LOG] handleMouseUp values {mode: resize, currentStart: undefined, currentEnd: 9} @ http://localhost:5176/src/renderer/components/TimeCanvas.tsx?t=1777019020231:97
+[   10260ms] [LOG] committing resize {currentEnd: 9, newEndDate: 2026-04-29} @ http://localhost:5176/src/renderer/components/TimeCanvas.tsx?t=1777019020231:109
+[   80258ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5176/node_modules/.vite/deps/react-dom_client.js?v=58de0eb0:20354

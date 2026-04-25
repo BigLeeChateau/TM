@@ -1,0 +1,102 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - heading "TM" [level=1] [ref=e6]
+    - generic [ref=e7]:
+      - generic [ref=e8]: Projects
+      - button "+ New Project" [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: +
+        - generic [ref=e12]: New Project
+    - generic [ref=e14]:
+      - generic [ref=e15]: GTD
+      - generic [ref=e16]:
+        - button "All Tasks" [ref=e17] [cursor=pointer]:
+          - generic [ref=e18]: All Tasks
+        - button "Inbox 0" [ref=e19] [cursor=pointer]:
+          - generic [ref=e20]: Inbox
+          - generic [ref=e21]: "0"
+        - button "Next 0" [ref=e22] [cursor=pointer]:
+          - generic [ref=e23]: Next
+          - generic [ref=e24]: "0"
+        - button "Waiting 0" [ref=e25] [cursor=pointer]:
+          - generic [ref=e26]: Waiting
+          - generic [ref=e27]: "0"
+        - button "Done 0" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Done
+          - generic [ref=e30]: "0"
+      - button "+ New Task" [ref=e32] [cursor=pointer]:
+        - generic [ref=e33]: +
+        - generic [ref=e34]: New Task
+  - main [ref=e35]:
+    - generic [ref=e36]:
+      - navigation [ref=e37]:
+        - button "canvas" [ref=e38] [cursor=pointer]
+        - button "list" [ref=e39] [cursor=pointer]
+        - button "dashboard" [ref=e40] [cursor=pointer]
+      - button "Export JSON" [ref=e41] [cursor=pointer]
+      - textbox "Search..." [ref=e42]
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]: T
+          - generic [ref=e49]: "21"
+        - generic [ref=e50]:
+          - generic [ref=e51]: W
+          - generic [ref=e52]: "22"
+        - generic [ref=e53]:
+          - generic [ref=e54]: T
+          - generic [ref=e55]: "23"
+        - generic [ref=e56]:
+          - generic [ref=e57]: F
+          - generic [ref=e58]: "24"
+        - generic [ref=e59]:
+          - generic [ref=e60]: S
+          - generic [ref=e61]: "25"
+        - generic [ref=e62]:
+          - generic [ref=e63]: S
+          - generic [ref=e64]: "26"
+        - generic [ref=e65]:
+          - generic [ref=e66]: M
+          - generic [ref=e67]: "27"
+        - generic [ref=e68]:
+          - generic [ref=e69]: T
+          - generic [ref=e70]: "28"
+        - generic [ref=e71]:
+          - generic [ref=e72]: W
+          - generic [ref=e73]: "29"
+        - generic [ref=e74]:
+          - generic [ref=e75]: T
+          - generic [ref=e76]: "30"
+        - generic [ref=e77]:
+          - generic [ref=e78]: F
+          - generic [ref=e79]: "1"
+        - generic [ref=e80]:
+          - generic [ref=e81]: S
+          - generic [ref=e82]: "2"
+        - generic [ref=e83]:
+          - generic [ref=e84]: S
+          - generic [ref=e85]: "3"
+        - generic [ref=e86]:
+          - generic [ref=e87]: M
+          - generic [ref=e88]: "4"
+        - generic [ref=e89]:
+          - generic [ref=e90]: T
+          - generic [ref=e91]: "5"
+        - generic [ref=e92]:
+          - generic [ref=e93]: W
+          - generic [ref=e94]: "6"
+        - generic [ref=e95]:
+          - generic [ref=e96]: T
+          - generic [ref=e97]: "7"
+        - generic [ref=e98]:
+          - generic [ref=e99]: F
+          - generic [ref=e100]: "8"
+        - generic [ref=e101]:
+          - generic [ref=e102]: S
+          - generic [ref=e103]: "9"
+        - generic [ref=e104]:
+          - generic [ref=e105]: S
+          - generic [ref=e106]: "10"
+        - generic [ref=e107]:
+          - generic [ref=e108]: M
+          - generic [ref=e109]: "11"
+      - generic [ref=e111]: Inbox / Unscheduled

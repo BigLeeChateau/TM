@@ -1,0 +1,58 @@
+[      41ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[      88ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+[    3128ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[  183608ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[  189526ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[  199463ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[  214417ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[  381475ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[  417544ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[  422197ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 3770981ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 4301180ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 4304585ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 4309049ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 4311901ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 4317568ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 4317609ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084444286:30:47)
+[ 4317609ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084444286:30:47)
+[ 4332981ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 4333023ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 4333023ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6414175ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6414222ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6414222ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6418287ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6418323ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6418323ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6421084ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6421128ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6421129ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6434054ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6434085ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6434085ms] TypeError: window.electronAPI.getProjectTimeSummary is not a function
+    at loadProjects (http://localhost:5173/src/renderer/store.ts?t=1777084459683:30:47)
+[ 6439963ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6499128ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6506355ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6508824ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6521801ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6579708ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6583301ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6654075ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6656323ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6659239ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6666374ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6708147ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
+[ 6724086ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=9880098f:20354
