@@ -30,6 +30,7 @@ export function initDatabase(): void {
   createTables()
   migrateTasksForeignKey()
   ensureDefaultProject()
+  migrateTimerColumns()
   ensureBackupDir()
 }
 
@@ -84,6 +85,21 @@ function migrateTasksForeignKey(): void {
     CREATE INDEX IF NOT EXISTS idx_tasks_deleted ON tasks(deleted_at);
     PRAGMA foreign_keys = ON;
   `)
+}
+
+function migrateTimerColumns(): void {
+  const db = getDb()
+  const cols = db.prepare("PRAGMA table_info(tasks)").all() as { name: string }[]
+  const colNames = new Set(cols.map((c) => c.name))
+  if (!colNames.has('timer_running')) {
+    db.prepare("ALTER TABLE tasks ADD COLUMN timer_running INTEGER DEFAULT 0").run()
+  }
+  if (!colNames.has('timer_started_at')) {
+    db.prepare("ALTER TABLE tasks ADD COLUMN timer_started_at TEXT").run()
+  }
+  if (!colNames.has('timer_accumulated')) {
+    db.prepare("ALTER TABLE tasks ADD COLUMN timer_accumulated INTEGER DEFAULT 0").run()
+  }
 }
 
 export function getDb(): Database.Database {
@@ -147,6 +163,17 @@ function createTables(): void {
     CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
     CREATE INDEX IF NOT EXISTS idx_tasks_deleted ON tasks(deleted_at);
     CREATE INDEX IF NOT EXISTS idx_mutations_task ON task_mutations(task_id);
+
+    CREATE TABLE IF NOT EXISTS time_entries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+      started_at TEXT NOT NULL,
+      ended_at TEXT,
+      duration_seconds INTEGER,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_time_entries_task ON time_entries(task_id);
   `)
 }
 

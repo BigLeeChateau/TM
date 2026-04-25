@@ -18,8 +18,18 @@ function computeDuration(start: string, end: string): number {
   return days * 8
 }
 
+function formatDuration(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600)
+  const mins = Math.floor((totalSeconds % 3600) / 60)
+  const secs = totalSeconds % 60
+  if (hours > 0) {
+    return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
 export function TaskModal({ taskId, onClose }: TaskModalProps) {
-  const { tasks, projects, updateTask, deleteTask } = useStore()
+  const { tasks, projects, updateTask, deleteTask, timeEntries, loadTimeEntries, toggleTaskTimer } = useStore()
   const task = tasks.find((t) => t.id === taskId)
 
   const [title, setTitle] = useState('')
@@ -32,6 +42,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
   const [actualStart, setActualStart] = useState('')
   const [actualEnd, setActualEnd] = useState('')
   const [actualDuration, setActualDuration] = useState<number | ''>('')
+  const [timerTick, setTimerTick] = useState(0)
 
   useEffect(() => {
     if (task) {
@@ -62,7 +73,27 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
     }
   }, [actualStart, actualEnd])
 
+  useEffect(() => {
+    if (task) {
+      loadTimeEntries(task.id)
+    }
+  }, [task?.id])
+
+  useEffect(() => {
+    if (!task?.timer_running) return
+    const id = setInterval(() => setTimerTick((t) => t + 1), 1000)
+    return () => clearInterval(id)
+  }, [task?.timer_running])
+
   if (!task) return null
+
+  const entries = timeEntries[task?.id ?? -1] ?? []
+  let totalTimerSeconds = task?.timer_accumulated ?? 0
+  if (task?.timer_running && task?.timer_started_at) {
+    totalTimerSeconds += Math.round((Date.now() - new Date(task.timer_started_at).getTime()) / 1000)
+  }
+  // timerTick is read to satisfy the compiler; it drives re-renders while the timer runs
+  void timerTick
 
   const handleSave = async () => {
     await updateTask(task.id, {
@@ -253,6 +284,58 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Session Log */}
+          <div className="border-t border-[#f0eee6] pt-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">
+                Session Log
+              </span>
+              <button
+                onClick={() => toggleTaskTimer(task.id)}
+                className={`px-2.5 py-1 text-xs rounded-lg transition-colors font-medium ${
+                  task.timer_running
+                    ? 'bg-[#c96442] text-[#faf9f5] hover:bg-[#d97757]'
+                    : 'bg-[#e8e6dc] text-[#4d4c48] hover:bg-[#d1cfc5]'
+                }`}
+              >
+                {task.timer_running ? 'Stop Timer' : 'Start Timer'}
+              </button>
+            </div>
+
+            {entries.length === 0 ? (
+              <p className="text-sm text-[#b0aea5]">No sessions recorded</p>
+            ) : (
+              <div className="space-y-1 max-h-32 overflow-auto">
+                {entries.map((entry) => (
+                  <div key={entry.id} className="flex items-center justify-between text-sm py-0.5">
+                    <span className="text-[#4d4c48] text-xs">
+                      {new Date(entry.started_at).toLocaleString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                    <span className="text-[#87867f] text-xs font-mono tabular-nums">
+                      {entry.ended_at && entry.duration_seconds != null
+                        ? formatDuration(entry.duration_seconds)
+                        : 'Running...'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {totalTimerSeconds > 0 && (
+              <div className="mt-2 pt-2 border-t border-[#f0eee6] flex items-center justify-between">
+                <span className="text-sm font-medium text-[#4d4c48]">Total</span>
+                <span className="text-sm font-medium text-[#c96442] font-mono tabular-nums">
+                  {formatDuration(totalTimerSeconds)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

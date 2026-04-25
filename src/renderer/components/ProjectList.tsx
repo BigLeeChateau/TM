@@ -1,8 +1,13 @@
 import React, { useState } from 'react'
 import { useStore } from '../store'
 
+function formatHours(totalSeconds: number): string {
+  const hours = (totalSeconds / 3600).toFixed(1)
+  return `${hours}h`
+}
+
 export function ProjectList() {
-  const { projects, selectedProjectId, setSelectedProject, createProject } = useStore()
+  const { projects, selectedProjectId, setSelectedProject, createProject, projectTimeSummaries } = useStore()
   const [isAdding, setIsAdding] = useState(false)
   const [newName, setNewName] = useState('')
 
@@ -33,7 +38,12 @@ export function ProjectList() {
               className="w-2.5 h-2.5 rounded-full flex-shrink-0"
               style={{ backgroundColor: project.color }}
             />
-            <span className="truncate">{project.name}</span>
+            <span className="truncate flex-1">{project.name}</span>
+            {projectTimeSummaries[project.id] > 0 && (
+              <span className="text-xs text-[#b0aea5] flex-shrink-0 font-mono tabular-nums">
+                {formatHours(projectTimeSummaries[project.id])}
+              </span>
+            )}
           </button>
         ))}
 

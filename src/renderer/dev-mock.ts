@@ -1,4 +1,4 @@
-import type { Project, Task, CreateProjectInput, UpdateProjectInput, CreateTaskInput, UpdateTaskInput } from '../shared/types'
+import type { Project, Task, CreateProjectInput, UpdateProjectInput, CreateTaskInput, UpdateTaskInput, TimeEntry } from '../shared/types'
 
 function loadMockData() {
   try {
@@ -12,8 +12,10 @@ function saveMockData() {
   localStorage.setItem('tm_mock_data', JSON.stringify({
     projects: mockProjects,
     tasks: mockTasks,
+    timeEntries: mockTimeEntries,
     nextProjectId,
     nextTaskId,
+    nextTimeEntryId,
   }))
 }
 
@@ -22,6 +24,8 @@ let mockProjects: Project[] = initial.projects
 let mockTasks: Task[] = initial.tasks
 let nextProjectId = initial.nextProjectId
 let nextTaskId = initial.nextTaskId
+let mockTimeEntries: TimeEntry[] = initial.timeEntries ?? []
+let nextTimeEntryId = initial.nextTimeEntryId ?? 1
 
 // Ensure default "Other" project exists
 if (!mockProjects.some((p) => p.name === 'Other')) {
@@ -104,6 +108,9 @@ function createTask(data: CreateTaskInput): Promise<Task> {
     dependencies: data.dependencies || '[]',
     recurrence_rule: data.recurrence_rule ?? null,
     created_at: new Date().toISOString(),
+    timer_running: 0,
+    timer_started_at: null,
+    timer_accumulated: 0,
   }
   mockTasks.push(task)
   saveMockData()
@@ -162,6 +169,59 @@ function exportData(): Promise<{ projects: Project[]; tasks: Task[] }> {
   return Promise.resolve({ projects: [...mockProjects], tasks: [...mockTasks] })
 }
 
+function toggleTaskTimer(taskId: number): Promise<Task> {
+  const t = mockTasks.find((x) => x.id === taskId)
+  if (!t) throw new Error('Not found')
+
+  if (t.timer_running) {
+    const entry = mockTimeEntries.find((e) => e.task_id === taskId && !e.ended_at)
+    if (entry) {
+      const startedAt = new Date(entry.started_at)
+      const now = new Date()
+      const elapsed = Math.round((now.getTime() - startedAt.getTime()) / 1000)
+      entry.ended_at = now.toISOString()
+      entry.duration_seconds = elapsed
+      t.timer_accumulated += elapsed
+    }
+    t.timer_running = 0
+    t.timer_started_at = null
+  } else {
+    mockTimeEntries.push({
+      id: nextTimeEntryId++,
+      task_id: taskId,
+      started_at: new Date().toISOString(),
+      ended_at: null,
+      duration_seconds: null,
+      created_at: new Date().toISOString(),
+    })
+    t.timer_running = 1
+    t.timer_started_at = new Date().toISOString()
+  }
+  saveMockData()
+  return Promise.resolve(t)
+}
+
+function listTimeEntries(taskId: number): Promise<TimeEntry[]> {
+  return Promise.resolve(
+    mockTimeEntries
+      .filter((e) => e.task_id === taskId)
+      .sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())
+  )
+}
+
+function getProjectTimeSummary(projectId: number): Promise<{ total_seconds: number }> {
+  let total = 0
+  const tasks = mockTasks.filter((t) => t.project_id === projectId)
+  for (const t of tasks) {
+    total += t.timer_accumulated
+    if (t.timer_running && t.timer_started_at) {
+      const elapsed = Math.round((new Date().getTime() - new Date(t.timer_started_at).getTime()) / 1000)
+      total += elapsed
+    }
+  }
+  return Promise.resolve({ total_seconds: total })
+}
+
 export const mockElectronAPI = {
   createProject,
   updateProject,
@@ -174,4 +234,7 @@ export const mockElectronAPI = {
   undo,
   redo,
   exportData,
+  toggleTaskTimer,
+  listTimeEntries,
+  getProjectTimeSummary,
 }

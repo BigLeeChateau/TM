@@ -3,6 +3,7 @@ import { getDb, snapshotDatabase, getDefaultProjectId, DEFAULT_PROJECT_NAME } fr
 import type {
   Project,
   Task,
+  TimeEntry,
   CreateProjectInput,
   UpdateProjectInput,
   CreateTaskInput,
@@ -162,6 +163,81 @@ export function registerIpcHandlers(): void {
       }
       return task
     })
+  })
+
+  ipcMain.handle('toggleTaskTimer', (_event, taskId: number): Task => {
+    const db = getDb()
+
+    const toggle = db.transaction((id: number) => {
+      const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as Task | undefined
+      if (!task) throw new Error(`Task ${id} not found`)
+
+      if (task.timer_running) {
+        const startedAt = new Date(task.timer_started_at!)
+        const now = new Date()
+        const elapsedSeconds = Math.round((now.getTime() - startedAt.getTime()) / 1000)
+
+        const updateResult = db.prepare(`
+          UPDATE time_entries
+          SET ended_at = ?, duration_seconds = ?
+          WHERE task_id = ? AND ended_at IS NULL
+        `).run(now.toISOString(), elapsedSeconds, id)
+
+        if (updateResult.changes === 0) {
+          throw new Error(`No open time entry found for task ${id}`)
+        }
+
+        db.prepare(`
+          UPDATE tasks
+          SET timer_running = 0, timer_started_at = NULL, timer_accumulated = timer_accumulated + ?
+          WHERE id = ?
+        `).run(elapsedSeconds, id)
+      } else {
+        const now = new Date().toISOString()
+        db.prepare(`
+          INSERT INTO time_entries (task_id, started_at) VALUES (?, ?)
+        `).run(id, now)
+
+        db.prepare(`
+          UPDATE tasks
+          SET timer_running = 1, timer_started_at = ?
+          WHERE id = ?
+        `).run(now, id)
+      }
+
+      return db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as Task
+    })
+
+    const updated = toggle(taskId)
+    snapshotDatabase()
+    return updated
+  })
+
+  ipcMain.handle('listTimeEntries', (_event, taskId: number): TimeEntry[] => {
+    const db = getDb()
+    return db.prepare(`
+      SELECT * FROM time_entries WHERE task_id = ? ORDER BY started_at DESC
+    `).all(taskId) as TimeEntry[]
+  })
+
+  ipcMain.handle('getProjectTimeSummary', (_event, projectId: number): { total_seconds: number } => {
+    const db = getDb()
+    const rows = db.prepare(`
+      SELECT timer_running, timer_started_at, timer_accumulated
+      FROM tasks
+      WHERE project_id = ? AND deleted_at IS NULL
+    `).all(projectId) as { timer_running: number; timer_started_at: string | null; timer_accumulated: number }[]
+
+    let total = 0
+    for (const t of rows) {
+      total += t.timer_accumulated
+      if (t.timer_running && t.timer_started_at) {
+        const elapsed = Math.round((new Date().getTime() - new Date(t.timer_started_at).getTime()) / 1000)
+        total += elapsed
+      }
+    }
+
+    return { total_seconds: total }
   })
 
   // Undo / Redo
