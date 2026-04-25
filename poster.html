@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TM - Promotional Poster</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f4ed;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+    .poster {
+      width: 900px;
+      background: #faf9f5;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.12);
+    }
+    .hero {
+      background: #141413;
+      padding: 80px 80px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: rgba(201, 100, 66, 0.08);
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      left: -100px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: rgba(201, 100, 66, 0.05);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    .logo-mark {
+      width: 64px;
+      height: 64px;
+      background: #c96442;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .logo-mark svg {
+      width: 36px;
+      height: 36px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 72px;
+      font-weight: 700;
+      color: #faf9f5;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 span {
+      color: #c96442;
+    }
+    .hero p {
+      font-size: 22px;
+      color: #87867f;
+      font-weight: 300;
+      max-width: 520px;
+      line-height: 1.5;
+    }
+    .features {
+      padding: 60px 80px;
+    }
+    .features-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .features-header h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 36px;
+      color: #141413;
+      margin-bottom: 8px;
+    }
+    .features-header p {
+      color: #87867f;
+      font-size: 16px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .feature-card {
+      background: #fff;
+      border: 1px solid #f0eee6;
+      border-radius: 16px;
+      padding: 28px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      background: #f5f4ed;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .feature-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #141413;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: #87867f;
+      line-height: 1.5;
+    }
+    .visual-section {
+      padding: 0 80px 60px;
+    }
+    .visual-card {
+      background: #fff;
+      border: 1px solid #f0eee6;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .visual-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid #f0eee6;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #c96442; }
+    .dot-yellow { background: #d97757; }
+    .dot-green { background: #4d4c48; }
+    .visual-header span {
+      font-size: 14px;
+      color: #87867f;
+      font-weight: 500;
+    }
+    .canvas-mock {
+      padding: 32px;
+      background: #faf9f5;
+    }
+    .timeline {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .day {
+      flex: 1;
+      text-align: center;
+      padding: 12px 4px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #f0eee6;
+    }
+    .day-label {
+      font-size: 11px;
+      color: #b0aea5;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .day-number {
+      font-size: 16px;
+      font-weight: 600;
+      color: #141413;
+    }
+    .day.today {
+      border-color: #c96442;
+      background: #fff8f5;
+    }
+    .day.today .day-number {
+      color: #c96442;
+    }
+    .bars {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .task-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .bar-track {
+      flex: 1;
+      height: 32px;
+      background: #f0eee6;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bar-fill {
+      position: absolute;
+      height: 100%;
+      border-radius: 8px;
+    }
+    .bar-fill.plan {
+      background: rgba(201, 100, 66, 0.3);
+    }
+    .bar-fill.actual {
+      background: #c96442;
+    }
+    .bar-label {
+      font-size: 13px;
+      color: #4d4c48;
+      font-weight: 500;
+      min-width: 100px;
+    }
+    .footer {
+      background: #141413;
+      padding: 48px 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 28px;
+      color: #faf9f5;
+      margin-bottom: 8px;
+    }
+    .footer-left p {
+      color: #87867f;
+      font-size: 15px;
+    }
+    .cta {
+      background: #c96442;
+      color: #faf9f5;
+      padding: 16px 36px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+    .cta:hover {
+      background: #d97757;
+    }
+    .status-dots {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="poster">
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-content">
+        <div class="logo-mark">
+          <svg viewBox="0 0 512 512" fill="none">
+            <circle cx="256" cy="256" r="160" stroke="#faf9f5" stroke-width="40"/>
+            <line x1="256" y1="256" x2="256" y2="160" stroke="#faf9f5" stroke-width="40" stroke-linecap="round"/>
+            <line x1="256" y1="256" x2="336" y2="256" stroke="#faf9f5" stroke-width="40" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h1>Time-first<br><span>project management</span></h1>
+        <p>Plan visually. Track actually. Ship consistently. A desktop app that bridges intention and execution.</p>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features">
+      <div class="features-header">
+        <h2>Built for focused work</h2>
+        <p>Not another todo list. A system that respects how time actually flows.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#c96442" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h3>Visual Planning</h3>
+          <p>Drag tasks onto a Gantt-style canvas. See your week at a glance with planned vs. actual timelines.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#c96442" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h3>Session Timer</h3>
+          <p>One-click timer per task. Every work session is logged. Know exactly where your hours went.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#c96442" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <h3>GTD Workflow</h3>
+          <p>Inbox → Next → Waiting → Done. A clear path for every task. No decision fatigue.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#c96442" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20V10"/>
+              <path d="M18 20V4"/>
+              <path d="M6 20v-4"/>
+            </svg>
+          </div>
+          <h3>Project Rollups</h3>
+          <p>Time aggregates automatically by project. See which efforts deserve your attention.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#c96442" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <h3>Overcommitment Alert</h3>
+          <p>Schedule more than 8 hours in a day? The canvas warns you. Protect your focus.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#c96442" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </div>
+          <h3>Own Your Data</h3>
+          <p>Everything stored locally in SQLite. Export to JSON anytime. No cloud lock-in.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visual -->
+    <div class="visual-section">
+      <div class="visual-card">
+        <div class="visual-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span>Plan + Actual view</span>
+        </div>
+        <div class="canvas-mock">
+          <div class="timeline">
+            <div class="day"><div class="day-label">M</div><div class="day-number">22</div></div>
+            <div class="day"><div class="day-label">T</div><div class="day-number">23</div></div>
+            <div class="day"><div class="day-label">W</div><div class="day-number">24</div></div>
+            <div class="day today"><div class="day-label">T</div><div class="day-number">25</div></div>
+            <div class="day"><div class="day-label">F</div><div class="day-number">26</div></div>
+            <div class="day"><div class="day-label">S</div><div class="day-number">27</div></div>
+            <div class="day"><div class="day-label">S</div><div class="day-number">28</div></div>
+          </div>
+          <div class="bars">
+            <div class="task-bar">
+              <div class="bar-label">Design system</div>
+              <div class="bar-track">
+                <div class="bar-fill plan" style="left: 0%; width: 42%;"></div>
+                <div class="bar-fill actual" style="left: 0%; width: 28%;"></div>
+              </div>
+            </div>
+            <div class="task-bar">
+              <div class="bar-label">API endpoints</div>
+              <div class="bar-track">
+                <div class="bar-fill plan" style="left: 14%; width: 42%;"></div>
+                <div class="bar-fill actual" style="left: 14%; width: 35%;"></div>
+              </div>
+            </div>
+            <div class="task-bar">
+              <div class="bar-label">User testing</div>
+              <div class="bar-track">
+                <div class="bar-fill plan" style="left: 42%; width: 28%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-left">
+        <h3>Stop guessing. Start tracking.</h3>
+        <p>Available for macOS, Windows & Linux. Free and open source.</p>
+      </div>
+      <a href="#" class="cta">Download TM</a>
+    </div>
+  </div>
+</body>
+</html>

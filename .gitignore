@@ -6,6 +6,10 @@ out/
 .playwright-mcp/
 .gstack/
 .superpowers/
+docs/
+CLAUDE.md
+DESIGN.md
+TODOS.md
 canvas-*.png
 redesign-*.png
 timer-test-*.png
