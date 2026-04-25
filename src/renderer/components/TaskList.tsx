@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useStore } from '../store'
-import type { TaskStatus } from '../../../shared/types'
-import type { Task } from '../../../shared/types'
+import type { TaskStatus } from '../../shared/types'
+import type { Task } from '../../shared/types'
 
 function formatDuration(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600)

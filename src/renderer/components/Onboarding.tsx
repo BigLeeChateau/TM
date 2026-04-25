@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const STORAGE_KEY = 'tm_onboarding_dismissed'
 

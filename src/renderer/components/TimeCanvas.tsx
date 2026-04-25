@@ -1,6 +1,7 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import type { MouseEvent as ReactMouseEvent, CSSProperties } from 'react'
 import { useStore } from '../store'
-import type { Task } from '../../../shared/types'
+import type { Task } from '../../shared/types'
 
 const DAY_WIDTH = 80
 const HEADER_HEIGHT = 56
@@ -109,7 +110,7 @@ export function TimeCanvas() {
 
   // ---- Drag handlers (only for planned blocks in plan/both mode) ----
   const handleMouseDown = useCallback(
-    (e: React.MouseEvent, task: Task, mode: 'move' | 'resize') => {
+    (e: ReactMouseEvent, task: Task, mode: 'move' | 'resize') => {
       e.preventDefault()
       const rect = canvasRef.current?.getBoundingClientRect()
       if (!rect) return
@@ -152,7 +153,7 @@ export function TimeCanvas() {
 
     const handleMouseUp = async () => {
       if (!dragState) return
-      const { taskId, mode, startIdx, currentStart, currentEnd } = dragState
+      const { taskId, mode, currentStart, currentEnd } = dragState
       if (currentStart !== undefined || currentEnd !== undefined) {
         if (mode === 'move' && currentStart !== undefined) {
           const duration = dragState.endIdx - dragState.startIdx
@@ -192,7 +193,7 @@ export function TimeCanvas() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const getTaskStyle = (task: Task, startKey: keyof Task, endKey: keyof Task, rowMap: Map<number, number>, rowOffset: number = 0): React.CSSProperties => {
+  const getTaskStyle = (task: Task, startKey: keyof Task, endKey: keyof Task, rowMap: Map<number, number>, rowOffset: number = 0): CSSProperties => {
     const startIdx = getDayIndex(task[startKey] as string | null)
     const endIdx = getDayIndex(task[endKey] as string | null)
     const row = rowMap.get(task.id) ?? 0
@@ -201,7 +202,7 @@ export function TimeCanvas() {
     let width = (endIdx - startIdx) * DAY_WIDTH
 
     // Apply drag preview (only for planned blocks)
-    if (dragState?.taskId === task.id && startKey === 'planned_start') {
+    if (dragState && dragState.taskId === task.id && startKey === 'planned_start') {
       if (dragState.currentStart !== undefined) {
         left = dragState.currentStart * DAY_WIDTH
         width = (dragState.currentEnd! - dragState.currentStart) * DAY_WIDTH
@@ -226,7 +227,7 @@ export function TimeCanvas() {
     const isPlanned = startKey === 'planned_start'
     return (
       <div
-        key={`${task.id}-${startKey}`}
+        key={`${task.id}-${String(startKey)}`}
         className={`absolute rounded-lg px-2 py-1 text-xs font-medium select-none cursor-move overflow-hidden whitespace-nowrap border ${
           task.status === 'done' ? 'opacity-40' : ''
         }`}

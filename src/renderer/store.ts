@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Project, Task, TaskStatus, TimeEntry, CreateProjectInput, UpdateProjectInput, CreateTaskInput, UpdateTaskInput } from '../../shared/types'
+import type { Project, Task, TaskStatus, TimeEntry, CreateProjectInput, UpdateProjectInput, CreateTaskInput, UpdateTaskInput } from '../shared/types'
 
 type View = 'canvas' | 'list' | 'dashboard'
 type CanvasMode = 'plan' | 'actual' | 'both'
