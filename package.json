@@ -5,10 +5,10 @@
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "bun run build:main && bun run build:preload && concurrently \"vite\" \"sleep 1 && electron .\"",
-    "build": "vite build && tsc --project tsconfig.main.json && tsc --project tsconfig.preload.json",
+    "build": "vite build --config vite.renderer.config.ts && tsc --project tsconfig.main.json && tsc --project tsconfig.preload.json",
     "build:main": "tsc --project tsconfig.main.json",
     "build:preload": "tsc --project tsconfig.preload.json",
-    "build:renderer": "vite build",
+    "build:renderer": "vite build --config vite.renderer.config.ts",
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },

@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest, windows-latest]
 
     steps:
       - name: Checkout
@@ -38,7 +38,32 @@ jobs:
           path: |
             dist/*.dmg
             dist/*.exe
-            dist/*.AppImage
-            dist/*.deb
-            dist/*.rpm
+            dist/*.msi
             dist/*.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download macOS build
+        uses: actions/download-artifact@v4
+        with:
+          name: macOS-build
+          path: dist/macOS
+
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows-build
+          path: dist/Windows
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/macOS/**
+            dist/Windows/**
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
