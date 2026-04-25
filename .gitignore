@@ -1,0 +1,12 @@
+node_modules/
+dist/
+out/
+*.log
+.DS_Store
+.playwright-mcp/
+.gstack/
+.superpowers/
+canvas-*.png
+redesign-*.png
+timer-test-*.png
+tm-fresh-state.png

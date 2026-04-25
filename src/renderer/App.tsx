@@ -4,9 +4,10 @@ import { ProjectList } from './components/ProjectList'
 import { TaskList } from './components/TaskList'
 import { TimeCanvas } from './components/TimeCanvas'
 import { TaskModal } from './components/TaskModal'
+import { Onboarding } from './components/Onboarding'
 
 export default function App() {
-  const { view, setView, loadProjects, loadTasks, editingTaskId, setEditingTaskId } = useStore()
+  const { view, setView, loadProjects, loadTasks, editingTaskId, setEditingTaskId, tasks } = useStore()
 
   useEffect(() => {
     loadProjects()
@@ -79,6 +80,8 @@ export default function App() {
         taskId={editingTaskId}
         onClose={() => setEditingTaskId(null)}
       />
+
+      {tasks.length === 0 && <Onboarding />}
     </div>
   )
 }
