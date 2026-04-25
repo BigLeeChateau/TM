@@ -153,7 +153,6 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                 onChange={(e) => setProjectId(e.target.value ? Number(e.target.value) : null)}
                 className="w-full px-3 py-2 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
               >
-                <option value="">None</option>
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
@@ -200,7 +199,10 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
           <div className="border-t border-[#f0eee6] pt-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">Actual Time</span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                {actualStart && !actualEnd && actualDuration !== '' && (
+                  <span className="text-[11px] text-[#c96442]">{actualDuration}h elapsed</span>
+                )}
                 {!actualStart && (
                   <button
                     onClick={handleStartNow}
