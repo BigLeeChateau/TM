@@ -1,6 +1,6 @@
 export type TaskStatus = 'inbox' | 'next' | 'waiting' | 'done'
 
-export interface Project {
+export interface Tag {
   id: number
   name: string
   description: string
@@ -13,7 +13,7 @@ export interface Task {
   title: string
   description: string
   status: TaskStatus
-  project_id: number | null
+  major_tag_id: number | null
   planned_start: string | null
   planned_end: string | null
   planned_duration: number | null
@@ -28,13 +28,13 @@ export interface Task {
   timer_accumulated: number
 }
 
-export interface CreateProjectInput {
+export interface CreateTagInput {
   name: string
   description?: string
   color?: string
 }
 
-export interface UpdateProjectInput {
+export interface UpdateTagInput {
   name?: string
   description?: string
   color?: string
@@ -44,7 +44,7 @@ export interface CreateTaskInput {
   title: string
   description?: string
   status?: TaskStatus
-  project_id?: number | null
+  major_tag_id?: number | null
   planned_start?: string | null
   planned_end?: string | null
   planned_duration?: number | null
@@ -56,7 +56,7 @@ export interface UpdateTaskInput {
   title?: string
   description?: string
   status?: TaskStatus
-  project_id?: number | null
+  major_tag_id?: number | null
   planned_start?: string | null
   planned_end?: string | null
   planned_duration?: number | null
