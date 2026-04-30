@@ -52,7 +52,7 @@ export function TaskList() {
     createTask,
     deleteTask,
     updateTask,
-    projects,
+    tags,
     setEditingTaskId,
     toggleTaskTimer,
   } = useStore()
@@ -151,13 +151,13 @@ export function TaskList() {
             {/* Timer display */}
             <TimerDisplay task={task} />
 
-            {/* Project dot */}
-            {task.project_id && (
+            {/* Major tag dot */}
+            {task.major_tag_id && (
               <span
                 className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                 style={{
                   backgroundColor:
-                    projects.find((p) => p.id === task.project_id)?.color ?? '#666',
+                    tags.find((t) => t.id === task.major_tag_id)?.color ?? '#666',
                 }}
               />
             )}
