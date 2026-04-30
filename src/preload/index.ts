@@ -1,24 +1,30 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type {
-  Project,
+  Tag,
   Task,
   TimeEntry,
-  CreateProjectInput,
-  UpdateProjectInput,
+  CreateTagInput,
+  UpdateTagInput,
   CreateTaskInput,
   UpdateTaskInput,
 } from '../shared/types'
 
 const api = {
-  // Projects
-  createProject: (data: CreateProjectInput): Promise<Project> =>
-    ipcRenderer.invoke('createProject', data),
-  updateProject: (id: number, data: UpdateProjectInput): Promise<Project> =>
-    ipcRenderer.invoke('updateProject', id, data),
-  deleteProject: (id: number): Promise<void> =>
-    ipcRenderer.invoke('deleteProject', id),
-  listProjects: (): Promise<Project[]> =>
-    ipcRenderer.invoke('listProjects'),
+  // Tags
+  createTag: (data: CreateTagInput): Promise<Tag> =>
+    ipcRenderer.invoke('createTag', data),
+  updateTag: (id: number, data: UpdateTagInput): Promise<Tag> =>
+    ipcRenderer.invoke('updateTag', id, data),
+  deleteTag: (id: number): Promise<void> =>
+    ipcRenderer.invoke('deleteTag', id),
+  listTags: (): Promise<Tag[]> =>
+    ipcRenderer.invoke('listTags'),
+
+  // Task tag associations
+  listTaskTags: (taskId: number): Promise<Tag[]> =>
+    ipcRenderer.invoke('listTaskTags', taskId),
+  setTaskTags: (taskId: number, tagIds: number[]): Promise<void> =>
+    ipcRenderer.invoke('setTaskTags', taskId, tagIds),
 
   // Tasks
   createTask: (data: CreateTaskInput): Promise<Task> =>
@@ -27,16 +33,16 @@ const api = {
     ipcRenderer.invoke('updateTask', id, data),
   deleteTask: (id: number): Promise<void> =>
     ipcRenderer.invoke('deleteTask', id),
-  listTasks: (projectId?: number | null, status?: string): Promise<Task[]> =>
-    ipcRenderer.invoke('listTasks', projectId, status),
+  listTasks: (majorTagId?: number | null, status?: string): Promise<Task[]> =>
+    ipcRenderer.invoke('listTasks', majorTagId, status),
 
   // Time tracking
   toggleTaskTimer: (taskId: number): Promise<Task> =>
     ipcRenderer.invoke('toggleTaskTimer', taskId),
   listTimeEntries: (taskId: number): Promise<TimeEntry[]> =>
     ipcRenderer.invoke('listTimeEntries', taskId),
-  getProjectTimeSummary: (projectId: number): Promise<{ total_seconds: number }> =>
-    ipcRenderer.invoke('getProjectTimeSummary', projectId),
+  getTagTimeSummary: (tagId: number): Promise<{ total_seconds: number }> =>
+    ipcRenderer.invoke('getTagTimeSummary', tagId),
 
   // Undo / Redo
   undo: (): Promise<{ success: boolean; task?: Task }> =>
@@ -45,7 +51,7 @@ const api = {
     ipcRenderer.invoke('redo'),
 
   // Export
-  exportData: (): Promise<{ projects: Project[]; tasks: Task[] }> =>
+  exportData: (): Promise<{ tags: Tag[]; tasks: Task[] }> =>
     ipcRenderer.invoke('exportData'),
 }
 
