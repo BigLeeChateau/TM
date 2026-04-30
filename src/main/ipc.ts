@@ -1,11 +1,11 @@
 import { ipcMain } from 'electron'
 import { getDb, snapshotDatabase, getDefaultTagId, DEFAULT_TAG_NAME } from './database'
 import type {
-  Project,
+  Tag,
   Task,
   TimeEntry,
-  CreateProjectInput,
-  UpdateProjectInput,
+  CreateTagInput,
+  UpdateTagInput,
   CreateTaskInput,
   UpdateTaskInput,
 } from '../shared/types'
@@ -19,19 +19,19 @@ function computeDuration(start: string | null | undefined, end?: string | null |
 }
 
 export function registerIpcHandlers(): void {
-  // Projects
-  ipcMain.handle('createProject', (_event, data: CreateProjectInput): Project => {
+  // Tags
+  ipcMain.handle('createTag', (_event, data: CreateTagInput): Tag => {
     const db = getDb()
     const stmt = db.prepare(
-      'INSERT INTO projects (name, description, color) VALUES (?, ?, ?)'
+      'INSERT INTO tags (name, description, color) VALUES (?, ?, ?)'
     )
     const result = stmt.run(data.name, data.description || '', data.color || '#3b82f6')
-    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(result.lastInsertRowid) as Project
+    const tag = db.prepare('SELECT * FROM tags WHERE id = ?').get(result.lastInsertRowid) as Tag
     snapshotDatabase()
-    return project
+    return tag
   })
 
-  ipcMain.handle('updateProject', (_event, id: number, data: UpdateProjectInput): Project => {
+  ipcMain.handle('updateTag', (_event, id: number, data: UpdateTagInput): Tag => {
     const db = getDb()
     const sets: string[] = []
     const values: (string | number)[] = []
@@ -39,29 +39,53 @@ export function registerIpcHandlers(): void {
     if (data.description !== undefined) { sets.push('description = ?'); values.push(data.description) }
     if (data.color !== undefined) { sets.push('color = ?'); values.push(data.color) }
     values.push(id)
-    const stmt = db.prepare(`UPDATE projects SET ${sets.join(', ')} WHERE id = ?`)
+    const stmt = db.prepare(`UPDATE tags SET ${sets.join(', ')} WHERE id = ?`)
     stmt.run(...values)
     snapshotDatabase()
-    return db.prepare('SELECT * FROM projects WHERE id = ?').get(id) as Project
+    return db.prepare('SELECT * FROM tags WHERE id = ?').get(id) as Tag
   })
 
-  ipcMain.handle('deleteProject', (_event, id: number): void => {
+  ipcMain.handle('deleteTag', (_event, id: number): void => {
     const db = getDb()
     const defaultId = getDefaultTagId()
     if (id === defaultId) {
       throw new Error(`Cannot delete the default '${DEFAULT_TAG_NAME}' tag`)
     }
-    const tx = db.transaction((projectId: number, fallbackId: number) => {
-      db.prepare('UPDATE tasks SET project_id = ? WHERE project_id = ?').run(fallbackId, projectId)
-      db.prepare('DELETE FROM projects WHERE id = ?').run(projectId)
+    const tx = db.transaction((tagId: number, fallbackId: number) => {
+      db.prepare('UPDATE tasks SET major_tag_id = ? WHERE major_tag_id = ?').run(fallbackId, tagId)
+      db.prepare('DELETE FROM tags WHERE id = ?').run(tagId)
     })
     tx(id, defaultId)
     snapshotDatabase()
   })
 
-  ipcMain.handle('listProjects', (): Project[] => {
+  ipcMain.handle('listTags', (): Tag[] => {
     const db = getDb()
-    return db.prepare('SELECT * FROM projects ORDER BY created_at DESC').all() as Project[]
+    return db.prepare('SELECT * FROM tags ORDER BY created_at DESC').all() as Tag[]
+  })
+
+  // Task tag associations
+  ipcMain.handle('listTaskTags', (_event, taskId: number): Tag[] => {
+    const db = getDb()
+    return db.prepare(`
+      SELECT t.* FROM tags t
+      JOIN task_tags tt ON t.id = tt.tag_id
+      WHERE tt.task_id = ?
+      ORDER BY t.name
+    `).all(taskId) as Tag[]
+  })
+
+  ipcMain.handle('setTaskTags', (_event, taskId: number, tagIds: number[]): void => {
+    const db = getDb()
+    const tx = db.transaction((tid: number, tids: number[]) => {
+      db.prepare('DELETE FROM task_tags WHERE task_id = ?').run(tid)
+      const stmt = db.prepare('INSERT INTO task_tags (task_id, tag_id) VALUES (?, ?)')
+      for (const tagId of tids) {
+        stmt.run(tid, tagId)
+      }
+    })
+    tx(taskId, tagIds)
+    snapshotDatabase()
   })
 
   // Tasks
@@ -69,14 +93,14 @@ export function registerIpcHandlers(): void {
     const db = getDb()
     const stmt = db.prepare(`
       INSERT INTO tasks
-      (title, description, status, project_id, planned_start, planned_end, planned_duration, dependencies, recurrence_rule)
+      (title, description, status, major_tag_id, planned_start, planned_end, planned_duration, dependencies, recurrence_rule)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     const result = stmt.run(
       data.title,
       data.description || '',
       data.status || 'inbox',
-      data.project_id ?? getDefaultTagId(),
+      data.major_tag_id ?? getDefaultTagId(),
       data.planned_start ?? null,
       data.planned_end ?? null,
       data.planned_duration ?? null,
@@ -98,7 +122,7 @@ export function registerIpcHandlers(): void {
     const values: (string | number | null)[] = []
 
     const fields: (keyof UpdateTaskInput)[] = [
-      'title', 'description', 'status', 'project_id',
+      'title', 'description', 'status', 'major_tag_id',
       'planned_start', 'planned_end', 'planned_duration',
       'actual_start', 'actual_end', 'actual_duration',
       'dependencies', 'recurrence_rule',
@@ -126,7 +150,6 @@ export function registerIpcHandlers(): void {
 
     const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as Task
 
-    // Push to undo stack
     pushUndo('updateTask', id, JSON.stringify(oldTask))
 
     snapshotDatabase()
@@ -143,13 +166,13 @@ export function registerIpcHandlers(): void {
     snapshotDatabase()
   })
 
-  ipcMain.handle('listTasks', (_event, projectId?: number | null, status?: string): Task[] => {
+  ipcMain.handle('listTasks', (_event, majorTagId?: number | null, status?: string): Task[] => {
     const db = getDb()
     let sql = 'SELECT * FROM tasks WHERE deleted_at IS NULL'
     const params: (number | string | null)[] = []
-    if (projectId !== undefined) {
-      sql += ' AND project_id = ?'
-      params.push(projectId)
+    if (majorTagId !== undefined) {
+      sql += ' AND major_tag_id = ?'
+      params.push(majorTagId)
     }
     if (status) {
       sql += ' AND status = ?'
@@ -220,13 +243,13 @@ export function registerIpcHandlers(): void {
     `).all(taskId) as TimeEntry[]
   })
 
-  ipcMain.handle('getProjectTimeSummary', (_event, projectId: number): { total_seconds: number } => {
+  ipcMain.handle('getTagTimeSummary', (_event, tagId: number): { total_seconds: number } => {
     const db = getDb()
     const rows = db.prepare(`
       SELECT timer_running, timer_started_at, timer_accumulated
       FROM tasks
-      WHERE project_id = ? AND deleted_at IS NULL
-    `).all(projectId) as { timer_running: number; timer_started_at: string | null; timer_accumulated: number }[]
+      WHERE major_tag_id = ? AND deleted_at IS NULL
+    `).all(tagId) as { timer_running: number; timer_started_at: string | null; timer_accumulated: number }[]
 
     let total = 0
     for (const t of rows) {
@@ -250,20 +273,19 @@ export function registerIpcHandlers(): void {
     const oldTask = JSON.parse(entry.previous_state) as Task
     const stmt = db.prepare(`
       UPDATE tasks SET
-        title = ?, description = ?, status = ?, project_id = ?,
+        title = ?, description = ?, status = ?, major_tag_id = ?,
         planned_start = ?, planned_end = ?, planned_duration = ?,
         actual_start = ?, actual_end = ?, actual_duration = ?,
         dependencies = ?, recurrence_rule = ?
       WHERE id = ?
     `)
     stmt.run(
-      oldTask.title, oldTask.description, oldTask.status, oldTask.project_id,
+      oldTask.title, oldTask.description, oldTask.status, oldTask.major_tag_id,
       oldTask.planned_start, oldTask.planned_end, oldTask.planned_duration,
       oldTask.actual_start, oldTask.actual_end, oldTask.actual_duration,
       oldTask.dependencies, oldTask.recurrence_rule,
       entry.task_id,
     )
-    // Restore soft-deleted task
     db.prepare('UPDATE tasks SET deleted_at = NULL WHERE id = ?').run(entry.task_id)
     db.prepare('DELETE FROM undo_stack WHERE id = ?').run(entry.id)
 
@@ -272,16 +294,15 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle('redo', (): { success: boolean; task?: Task } => {
-    // Redo not implemented in v1 — undo stack is linear
     return { success: false }
   })
 
   // Export
-  ipcMain.handle('exportData', (): { projects: Project[]; tasks: Task[] } => {
+  ipcMain.handle('exportData', (): { tags: Tag[]; tasks: Task[] } => {
     const db = getDb()
-    const projects = db.prepare('SELECT * FROM projects').all() as Project[]
+    const tags = db.prepare('SELECT * FROM tags').all() as Tag[]
     const tasks = db.prepare('SELECT * FROM tasks WHERE deleted_at IS NULL').all() as Task[]
-    return { projects, tasks }
+    return { tags, tasks }
   })
 }
 
@@ -295,6 +316,5 @@ function pushUndo(actionType: string, taskId: number, previousState: string): vo
   const db = getDb()
   db.prepare('INSERT INTO undo_stack (action_type, task_id, previous_state) VALUES (?, ?, ?)')
     .run(actionType, taskId, previousState)
-  // Keep only last 50
   db.prepare('DELETE FROM undo_stack WHERE id <= (SELECT id FROM undo_stack ORDER BY id DESC LIMIT 1 OFFSET 50)').run()
 }
