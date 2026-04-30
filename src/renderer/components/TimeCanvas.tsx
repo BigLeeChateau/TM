@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import type { MouseEvent as ReactMouseEvent, CSSProperties } from 'react'
 import { useStore } from '../store'
 import type { Task, Tag } from '../../shared/types'
@@ -12,12 +12,11 @@ const OVERCOMMIT_THRESHOLD = 8
 const GROUP_HEADER_HEIGHT = 28
 const GROUP_GAP = 12
 
-let draggedTaskId: number | null = null
-
 export function TimeCanvas() {
   const { tasks, tags, updateTask, setEditingTaskId, canvasMode, setCanvasMode, collapsedTagIds, toggleTagCollapse, expandAllTags, ganttSortBy, setGanttSortBy } = useStore()
   const canvasRef = useRef<HTMLDivElement>(null)
   const [dragState, setDragState] = useState<DragState | null>(null)
+  const draggedTaskIdRef = useRef<number | null>(null)
 
   // Determine date range
   const now = new Date()
@@ -72,116 +71,128 @@ export function TimeCanvas() {
     return rows
   }
 
-  // ---- Overcommitment: sum planned_duration per day ----
-  const dayLoad = new Map<number, number>()
-  for (let i = 0; i < dayCount; i++) {
-    let total = 0
-    for (const task of tasks) {
-      const s = getDayIndex(task.planned_start)
-      const e = getDayIndex(task.planned_end)
-      if (s <= i && e > i) {
-        total += task.planned_duration ?? (e - s) * 8
+  const tagById = useMemo(() => {
+    const map = new Map<number, Tag>()
+    for (const t of tags) map.set(t.id, t)
+    return map
+  }, [tags])
+
+  const tagColor = (tid: number | null) =>
+    tagById.get(tid ?? -1)?.color ?? '#4b5563'
+
+  const { dayLoad, groups, tasksByTag, canvasHeight } = useMemo(() => {
+    // ---- Overcommitment: sum planned_duration per day ----
+    const dayLoad = new Map<number, number>()
+    for (let i = 0; i < dayCount; i++) {
+      let total = 0
+      for (const task of tasks) {
+        const s = getDayIndex(task.planned_start)
+        const e = getDayIndex(task.planned_end)
+        if (s <= i && e > i) {
+          total += task.planned_duration ?? (e - s) * 8
+        }
       }
+      dayLoad.set(i, total)
     }
-    dayLoad.set(i, total)
-  }
 
-  // ---- Group tasks by major tag ----
-  const tasksByTag = new Map<number | null, Task[]>()
-  for (const task of tasks) {
-    const key = task.major_tag_id ?? null
-    if (!tasksByTag.has(key)) tasksByTag.set(key, [])
-    tasksByTag.get(key)!.push(task)
-  }
-
-  // ---- Sort tag groups ----
-  const tagEntries = Array.from(tasksByTag.entries())
-  tagEntries.sort((a, b) => {
-    const [tagIdA, tasksA] = a
-    const [tagIdB, tasksB] = b
-    const tagA = tags.find((t) => t.id === tagIdA)
-    const tagB = tags.find((t) => t.id === tagIdB)
-
-    if (ganttSortBy === 'name') {
-      const nameA = tagA?.name ?? 'Other'
-      const nameB = tagB?.name ?? 'Other'
-      return nameA.localeCompare(nameB)
+    // ---- Group tasks by major tag ----
+    const tasksByTag = new Map<number | null, Task[]>()
+    for (const task of tasks) {
+      const key = task.major_tag_id ?? null
+      if (!tasksByTag.has(key)) tasksByTag.set(key, [])
+      tasksByTag.get(key)!.push(task)
     }
-    if (ganttSortBy === 'created_at') {
-      const createdA = tagA?.created_at ?? ''
-      const createdB = tagB?.created_at ?? ''
-      return createdB.localeCompare(createdA)
-    }
-    // earliest (default)
-    const earliestA = Math.min(...tasksA.map((t) => {
-      const ps = getDayIndex(t.planned_start)
-      const as = getDayIndex(t.actual_start)
-      if (ps >= 0 && as >= 0) return Math.min(ps, as)
-      return ps >= 0 ? ps : (as >= 0 ? as : Infinity)
-    }))
-    const earliestB = Math.min(...tasksB.map((t) => {
-      const ps = getDayIndex(t.planned_start)
-      const as = getDayIndex(t.actual_start)
-      if (ps >= 0 && as >= 0) return Math.min(ps, as)
-      return ps >= 0 ? ps : (as >= 0 ? as : Infinity)
-    }))
-    if (earliestA === Infinity && earliestB === Infinity) return 0
-    if (earliestA === Infinity) return 1
-    if (earliestB === Infinity) return -1
-    return earliestA - earliestB
-  })
 
-  // ---- Per-group row assignment ----
-  interface GroupInfo {
-    tagId: number | null
-    tag: Tag | undefined
-    plannedRows: Map<number, number>
-    actualRows: Map<number, number>
-    maxPlannedRow: number
-    maxActualRow: number
-    height: number
-    yOffset: number
-  }
+    // ---- Sort tag groups ----
+    const tagEntries = Array.from(tasksByTag.entries())
+    tagEntries.sort((a, b) => {
+      const [tagIdA, tasksA] = a
+      const [tagIdB, tasksB] = b
+      const tagA = tagById.get(tagIdA ?? -1)
+      const tagB = tagById.get(tagIdB ?? -1)
 
-  const groups: GroupInfo[] = []
-  let currentYOffset = 0
-
-  for (const [tagId, groupTasks] of tagEntries) {
-    const planned = groupTasks.filter((t) => t.planned_start && t.planned_end)
-    const actual = groupTasks.filter((t) => t.actual_start && t.actual_end)
-
-    const plannedRows = assignRows(planned, 'planned_start', 'planned_end')
-    const actualRows = assignRows(actual, 'actual_start', 'actual_end')
-
-    const maxPlanned = planned.length > 0
-      ? Math.max(...planned.map((t) => plannedRows.get(t.id) ?? 0)) + 1
-      : 0
-    const maxActual = actual.length > 0
-      ? Math.max(...actual.map((t) => actualRows.get(t.id) ?? 0)) + 1
-      : 0
-
-    const isCollapsed = collapsedTagIds.includes(tagId ?? -1)
-    const taskHeight = isCollapsed
-      ? 0
-      : maxPlanned * (BLOCK_HEIGHT + BLOCK_GAP) + maxActual * (BLOCK_HEIGHT + BLOCK_GAP)
-
-    const height = GROUP_HEADER_HEIGHT + taskHeight + GROUP_GAP
-
-    groups.push({
-      tagId,
-      tag: tags.find((t) => t.id === tagId),
-      plannedRows,
-      actualRows,
-      maxPlannedRow: maxPlanned,
-      maxActualRow: maxActual,
-      height,
-      yOffset: currentYOffset,
+      if (ganttSortBy === 'name') {
+        const nameA = tagA?.name ?? 'Other'
+        const nameB = tagB?.name ?? 'Other'
+        return nameA.localeCompare(nameB)
+      }
+      if (ganttSortBy === 'created_at') {
+        const createdA = tagA?.created_at ?? ''
+        const createdB = tagB?.created_at ?? ''
+        return createdB.localeCompare(createdA)
+      }
+      // earliest (default)
+      const earliestA = Math.min(...tasksA.map((t) => {
+        const ps = getDayIndex(t.planned_start)
+        const as = getDayIndex(t.actual_start)
+        if (ps >= 0 && as >= 0) return Math.min(ps, as)
+        return ps >= 0 ? ps : (as >= 0 ? as : Infinity)
+      }))
+      const earliestB = Math.min(...tasksB.map((t) => {
+        const ps = getDayIndex(t.planned_start)
+        const as = getDayIndex(t.actual_start)
+        if (ps >= 0 && as >= 0) return Math.min(ps, as)
+        return ps >= 0 ? ps : (as >= 0 ? as : Infinity)
+      }))
+      if (earliestA === Infinity && earliestB === Infinity) return 0
+      if (earliestA === Infinity) return 1
+      if (earliestB === Infinity) return -1
+      return earliestA - earliestB
     })
 
-    currentYOffset += height
-  }
+    // ---- Per-group row assignment ----
+    interface GroupInfo {
+      tagId: number | null
+      tag: Tag | undefined
+      plannedRows: Map<number, number>
+      actualRows: Map<number, number>
+      maxPlannedRow: number
+      maxActualRow: number
+      height: number
+      yOffset: number
+    }
 
-  const canvasHeight = ROW_OFFSET + currentYOffset + 40
+    const groups: GroupInfo[] = []
+    let currentYOffset = 0
+
+    for (const [tagId, groupTasks] of tagEntries) {
+      const planned = groupTasks.filter((t) => t.planned_start && t.planned_end)
+      const actual = groupTasks.filter((t) => t.actual_start && t.actual_end)
+
+      const plannedRows = assignRows(planned, 'planned_start', 'planned_end')
+      const actualRows = assignRows(actual, 'actual_start', 'actual_end')
+
+      const maxPlanned = planned.length > 0
+        ? Math.max(...planned.map((t) => plannedRows.get(t.id) ?? 0)) + 1
+        : 0
+      const maxActual = actual.length > 0
+        ? Math.max(...actual.map((t) => actualRows.get(t.id) ?? 0)) + 1
+        : 0
+
+      const isCollapsed = collapsedTagIds.includes(tagId ?? -1)
+      const taskHeight = isCollapsed
+        ? 0
+        : maxPlanned * (BLOCK_HEIGHT + BLOCK_GAP) + maxActual * (BLOCK_HEIGHT + BLOCK_GAP)
+
+      const height = GROUP_HEADER_HEIGHT + taskHeight + GROUP_GAP
+
+      groups.push({
+        tagId,
+        tag: tagById.get(tagId ?? -1),
+        plannedRows,
+        actualRows,
+        maxPlannedRow: maxPlanned,
+        maxActualRow: maxActual,
+        height,
+        yOffset: currentYOffset,
+      })
+
+      currentYOffset += height
+    }
+
+    const canvasHeight = ROW_OFFSET + currentYOffset + 40
+    return { dayLoad, groups, tasksByTag, canvasHeight }
+  }, [tasks, tags, ganttSortBy, collapsedTagIds])
 
   // ---- Drag handlers (only for planned blocks in plan/both mode) ----
   const handleMouseDown = useCallback(
@@ -293,9 +304,6 @@ export function TimeCanvas() {
       height: BLOCK_HEIGHT,
     }
   }
-
-  const tagColor = (tid: number | null) =>
-    tags.find((t) => t.id === tid)?.color ?? '#4b5563'
 
   const renderBlock = (task: Task, startKey: keyof Task, endKey: keyof Task, rowMap: Map<number, number>, rowOffset: number = 0) => {
     const isPlanned = startKey === 'planned_start'
@@ -415,7 +423,7 @@ export function TimeCanvas() {
                   className="px-2 py-1 rounded bg-white text-[#4d4c48] border border-[#e8e6dc]"
                   draggable
                   onDragStart={() => {
-                    draggedTaskId = task.id
+                    draggedTaskIdRef.current = task.id
                   }}
                 >
                   {task.title}
@@ -440,14 +448,14 @@ export function TimeCanvas() {
                   style={{ width: DAY_WIDTH, borderColor: 'rgba(240, 238, 230, 0.6)' }}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={() => {
-                    if (!draggedTaskId) return
+                    if (!draggedTaskIdRef.current) return
                     const dropDate = getDateFromIndex(i)
                     const nextDay = getDateFromIndex(i + 1)
-                    updateTask(draggedTaskId, {
+                    updateTask(draggedTaskIdRef.current, {
                       planned_start: dropDate,
                       planned_end: nextDay,
                     })
-                    draggedTaskId = null
+                    draggedTaskIdRef.current = null
                   }}
                 />
               )
@@ -478,7 +486,7 @@ export function TimeCanvas() {
                     className="w-2 h-2 rounded-full flex-shrink-0"
                     style={{ backgroundColor: group.tag?.color ?? '#87867f' }}
                   />
-                  <span className="text-[11px] font-semibold text-[#141413]">
+                  <span className="text-[11px] font-bold text-[#141413]">
                     {group.tag?.name ?? 'Other'}
                   </span>
                   {isCollapsed && (
