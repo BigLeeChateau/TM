@@ -29,13 +29,14 @@ function formatDuration(totalSeconds: number): string {
 }
 
 export function TaskModal({ taskId, onClose }: TaskModalProps) {
-  const { tasks, projects, updateTask, deleteTask, timeEntries, loadTimeEntries, toggleTaskTimer } = useStore()
+  const { tasks, tags, updateTask, deleteTask, timeEntries, loadTimeEntries, toggleTaskTimer } = useStore()
   const task = tasks.find((t) => t.id === taskId)
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState<TaskStatus>('inbox')
-  const [projectId, setProjectId] = useState<number | null>(null)
+  const [majorTagId, setMajorTagId] = useState<number | null>(null)
+  const [secondaryTagIds, setSecondaryTagIds] = useState<number[]>([])
   const [plannedStart, setPlannedStart] = useState('')
   const [plannedEnd, setPlannedEnd] = useState('')
   const [plannedDuration, setPlannedDuration] = useState<number | ''>('')
@@ -49,13 +50,17 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
       setTitle(task.title)
       setDescription(task.description)
       setStatus(task.status)
-      setProjectId(task.project_id)
+      setMajorTagId(task.major_tag_id)
       setPlannedStart(task.planned_start ?? '')
       setPlannedEnd(task.planned_end ?? '')
       setPlannedDuration(task.planned_duration ?? '')
       setActualStart(task.actual_start ?? '')
       setActualEnd(task.actual_end ?? '')
       setActualDuration(task.actual_duration ?? '')
+      // Load secondary tags
+      window.electronAPI.listTaskTags(task.id).then((taskTags) => {
+        setSecondaryTagIds(taskTags.map((t) => t.id))
+      })
     }
   }, [task])
 
@@ -100,7 +105,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
       title: title.trim(),
       description: description.trim(),
       status,
-      project_id: projectId,
+      major_tag_id: majorTagId,
       planned_start: plannedStart || null,
       planned_end: plannedEnd || null,
       planned_duration: plannedDuration ? Number(plannedDuration) : null,
@@ -108,6 +113,9 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
       actual_end: actualEnd || null,
       actual_duration: actualDuration ? Number(actualDuration) : null,
     })
+    // Sync secondary tags (exclude major tag)
+    const secondaryIds = secondaryTagIds.filter((id) => id !== majorTagId)
+    await window.electronAPI.setTaskTags(task.id, secondaryIds)
     onClose()
   }
 
@@ -178,18 +186,64 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
             </div>
 
             <div>
-              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Project</label>
+              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Major Tag</label>
               <select
-                value={projectId ?? ''}
-                onChange={(e) => setProjectId(e.target.value ? Number(e.target.value) : null)}
+                value={majorTagId ?? ''}
+                onChange={(e) => {
+                  const newId = e.target.value ? Number(e.target.value) : null
+                  setMajorTagId(newId)
+                  // Remove new major tag from secondary selection
+                  if (newId != null) {
+                    setSecondaryTagIds((prev) => prev.filter((id) => id !== newId))
+                  }
+                }}
                 className="w-full px-3 py-2 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
               >
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
+                {tags.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Secondary Tags</label>
+            <div className="flex flex-wrap gap-2">
+              {tags
+                .filter((t) => t.id !== majorTagId)
+                .map((t) => (
+                  <label
+                    key={t.id}
+                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs border cursor-pointer transition-colors ${
+                      secondaryTagIds.includes(t.id)
+                        ? 'bg-[#f5f4ed] border-[#c96442] text-[#141413]'
+                        : 'bg-white border-[#e8e6dc] text-[#87867f] hover:border-[#b0aea5]'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="hidden"
+                      checked={secondaryTagIds.includes(t.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSecondaryTagIds((prev) => [...prev, t.id])
+                        } else {
+                          setSecondaryTagIds((prev) => prev.filter((id) => id !== t.id))
+                        }
+                      }}
+                    />
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: t.color }}
+                    />
+                    <span>{t.name}</span>
+                  </label>
+                ))}
+              {tags.filter((t) => t.id !== majorTagId).length === 0 && (
+                <span className="text-xs text-[#b0aea5]">No other tags available</span>
+              )}
             </div>
           </div>
 
