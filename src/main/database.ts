@@ -3,7 +3,7 @@ import path from 'path'
 import { app } from 'electron'
 import fs from 'fs'
 
-export const DEFAULT_PROJECT_NAME = 'Other'
+export const DEFAULT_TAG_NAME = 'Other'
 
 let db: Database.Database | null = null
 
@@ -29,23 +29,59 @@ export function initDatabase(): void {
 
   createTables()
   migrateTasksForeignKey()
-  ensureDefaultProject()
+  migrateProjectsToTags()
+  ensureDefaultTag()
   migrateTimerColumns()
   ensureBackupDir()
 }
 
-function ensureDefaultProject(): void {
+function migrateProjectsToTags(): void {
   const db = getDb()
-  const existing = db.prepare('SELECT id FROM projects WHERE name = ?').get(DEFAULT_PROJECT_NAME) as { id: number } | undefined
+  // Check if already migrated
+  const tagsExists = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='tags'"
+  ).get() as { name: string } | undefined
+  if (tagsExists) return
+
+  // 1. Create tags table and copy projects
+  db.exec(`
+    CREATE TABLE tags (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      color TEXT DEFAULT '#3b82f6',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+    INSERT INTO tags SELECT * FROM projects;
+  `)
+
+  // 2. Add major_tag_id to tasks and copy values
+  db.prepare('ALTER TABLE tasks ADD COLUMN major_tag_id INTEGER').run()
+  db.prepare('UPDATE tasks SET major_tag_id = project_id').run()
+
+  // 3. Create task_tags junction table
+  db.exec(`
+    CREATE TABLE task_tags (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+      tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+      UNIQUE(task_id, tag_id)
+    );
+  `)
+}
+
+function ensureDefaultTag(): void {
+  const db = getDb()
+  const existing = db.prepare('SELECT id FROM tags WHERE name = ?').get(DEFAULT_TAG_NAME) as { id: number } | undefined
   if (!existing) {
-    db.prepare('INSERT INTO projects (name, description, color) VALUES (?, ?, ?)').run(DEFAULT_PROJECT_NAME, '', '#87867f')
+    db.prepare('INSERT INTO tags (name, description, color) VALUES (?, ?, ?)').run(DEFAULT_TAG_NAME, '', '#87867f')
   }
 }
 
-export function getDefaultProjectId(): number {
+export function getDefaultTagId(): number {
   const db = getDb()
-  const row = db.prepare('SELECT id FROM projects WHERE name = ?').get(DEFAULT_PROJECT_NAME) as { id: number } | undefined
-  if (!row) throw new Error(`Default '${DEFAULT_PROJECT_NAME}' project not found`)
+  const row = db.prepare('SELECT id FROM tags WHERE name = ?').get(DEFAULT_TAG_NAME) as { id: number } | undefined
+  if (!row) throw new Error(`Default '${DEFAULT_TAG_NAME}' tag not found`)
   return row.id
 }
 
@@ -174,6 +210,23 @@ function createTables(): void {
     );
 
     CREATE INDEX IF NOT EXISTS idx_time_entries_task ON time_entries(task_id);
+
+    CREATE TABLE IF NOT EXISTS tags (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      color TEXT DEFAULT '#3b82f6',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS task_tags (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+      tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+      UNIQUE(task_id, tag_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id);
   `)
 }
 
