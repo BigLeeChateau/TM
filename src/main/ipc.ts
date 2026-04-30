@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron'
-import { getDb, snapshotDatabase, getDefaultProjectId, DEFAULT_PROJECT_NAME } from './database'
+import { getDb, snapshotDatabase, getDefaultTagId, DEFAULT_TAG_NAME } from './database'
 import type {
   Project,
   Task,
@@ -47,9 +47,9 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('deleteProject', (_event, id: number): void => {
     const db = getDb()
-    const defaultId = getDefaultProjectId()
+    const defaultId = getDefaultTagId()
     if (id === defaultId) {
-      throw new Error(`Cannot delete the default '${DEFAULT_PROJECT_NAME}' project`)
+      throw new Error(`Cannot delete the default '${DEFAULT_TAG_NAME}' project`)
     }
     const tx = db.transaction((projectId: number, fallbackId: number) => {
       db.prepare('UPDATE tasks SET project_id = ? WHERE project_id = ?').run(fallbackId, projectId)
@@ -76,7 +76,7 @@ export function registerIpcHandlers(): void {
       data.title,
       data.description || '',
       data.status || 'inbox',
-      data.project_id ?? getDefaultProjectId(),
+      data.project_id ?? getDefaultTagId(),
       data.planned_start ?? null,
       data.planned_end ?? null,
       data.planned_duration ?? null,

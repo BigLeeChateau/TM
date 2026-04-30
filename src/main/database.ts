@@ -58,6 +58,7 @@ function migrateProjectsToTags(): void {
   // 2. Add major_tag_id to tasks and copy values
   db.prepare('ALTER TABLE tasks ADD COLUMN major_tag_id INTEGER').run()
   db.prepare('UPDATE tasks SET major_tag_id = project_id').run()
+  db.prepare('CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id)').run()
 
   // 3. Create task_tags junction table
   db.exec(`
