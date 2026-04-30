@@ -37,38 +37,46 @@ export function initDatabase(): void {
 
 function migrateProjectsToTags(): void {
   const db = getDb()
-  // Check if already migrated
+
+  // 1. Create tags table if not exists
   const tagsExists = db.prepare(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='tags'"
   ).get() as { name: string } | undefined
-  if (tagsExists) return
+  if (!tagsExists) {
+    db.exec(`
+      CREATE TABLE tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        color TEXT DEFAULT '#3b82f6',
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+      INSERT INTO tags SELECT * FROM projects;
+    `)
+  }
 
-  // 1. Create tags table and copy projects
-  db.exec(`
-    CREATE TABLE tags (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      description TEXT DEFAULT '',
-      color TEXT DEFAULT '#3b82f6',
-      created_at TEXT DEFAULT (datetime('now'))
-    );
-    INSERT INTO tags SELECT * FROM projects;
-  `)
+  // 2. Add major_tag_id if not exists
+  const cols = db.prepare("PRAGMA table_info(tasks)").all() as { name: string }[]
+  if (!cols.some((c) => c.name === 'major_tag_id')) {
+    db.prepare('ALTER TABLE tasks ADD COLUMN major_tag_id INTEGER').run()
+    db.prepare('UPDATE tasks SET major_tag_id = project_id').run()
+    db.prepare('CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id)').run()
+  }
 
-  // 2. Add major_tag_id to tasks and copy values
-  db.prepare('ALTER TABLE tasks ADD COLUMN major_tag_id INTEGER').run()
-  db.prepare('UPDATE tasks SET major_tag_id = project_id').run()
-  db.prepare('CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id)').run()
-
-  // 3. Create task_tags junction table
-  db.exec(`
-    CREATE TABLE task_tags (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-      tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-      UNIQUE(task_id, tag_id)
-    );
-  `)
+  // 3. Create task_tags if not exists
+  const taskTagsExists = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='task_tags'"
+  ).get() as { name: string } | undefined
+  if (!taskTagsExists) {
+    db.exec(`
+      CREATE TABLE task_tags (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+        UNIQUE(task_id, tag_id)
+      );
+    `)
+  }
 }
 
 function ensureDefaultTag(): void {

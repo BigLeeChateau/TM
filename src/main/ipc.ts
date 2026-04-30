@@ -49,7 +49,7 @@ export function registerIpcHandlers(): void {
     const db = getDb()
     const defaultId = getDefaultTagId()
     if (id === defaultId) {
-      throw new Error(`Cannot delete the default '${DEFAULT_TAG_NAME}' project`)
+      throw new Error(`Cannot delete the default '${DEFAULT_TAG_NAME}' tag`)
     }
     const tx = db.transaction((projectId: number, fallbackId: number) => {
       db.prepare('UPDATE tasks SET project_id = ? WHERE project_id = ?').run(fallbackId, projectId)
