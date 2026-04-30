@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import type { MouseEvent as ReactMouseEvent, CSSProperties } from 'react'
 import { useStore } from '../store'
-import type { Task } from '../../shared/types'
+import type { Task, Tag } from '../../shared/types'
 
 const DAY_WIDTH = 80
 const HEADER_HEIGHT = 56
@@ -9,11 +9,13 @@ const BLOCK_HEIGHT = 32
 const BLOCK_GAP = 8
 const ROW_OFFSET = 60
 const OVERCOMMIT_THRESHOLD = 8
+const GROUP_HEADER_HEIGHT = 28
+const GROUP_GAP = 12
 
 let draggedTaskId: number | null = null
 
 export function TimeCanvas() {
-  const { tasks, projects, updateTask, setEditingTaskId, canvasMode, setCanvasMode } = useStore()
+  const { tasks, tags, updateTask, setEditingTaskId, canvasMode, setCanvasMode, collapsedTagIds, toggleTagCollapse, expandAllTags, ganttSortBy, setGanttSortBy } = useStore()
   const canvasRef = useRef<HTMLDivElement>(null)
   const [dragState, setDragState] = useState<DragState | null>(null)
 
@@ -84,29 +86,102 @@ export function TimeCanvas() {
     dayLoad.set(i, total)
   }
 
-  // Filter tasks based on canvas mode
-  const plannedTasks = tasks.filter((t) => t.planned_start && t.planned_end)
-  const actualTasks = tasks.filter((t) => t.actual_start && t.actual_end)
-
-  const plannedRows = assignRows(plannedTasks, 'planned_start', 'planned_end')
-  const actualRows = assignRows(actualTasks, 'actual_start', 'actual_end')
-
-  const maxPlannedRow = plannedTasks.length > 0
-    ? Math.max(...plannedTasks.map((t) => plannedRows.get(t.id) ?? 0)) + 1
-    : 1
-  const maxActualRow = actualTasks.length > 0
-    ? Math.max(...actualTasks.map((t) => actualRows.get(t.id) ?? 0)) + 1
-    : 1
-
-  // Canvas height depends on mode
-  let canvasHeight: number
-  if (canvasMode === 'both') {
-    canvasHeight = ROW_OFFSET + maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP) + 20 + maxActualRow * (BLOCK_HEIGHT + BLOCK_GAP) + 40
-  } else if (canvasMode === 'actual') {
-    canvasHeight = ROW_OFFSET + maxActualRow * (BLOCK_HEIGHT + BLOCK_GAP) + 40
-  } else {
-    canvasHeight = ROW_OFFSET + maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP) + 40
+  // ---- Group tasks by major tag ----
+  const tasksByTag = new Map<number | null, Task[]>()
+  for (const task of tasks) {
+    const key = task.major_tag_id ?? null
+    if (!tasksByTag.has(key)) tasksByTag.set(key, [])
+    tasksByTag.get(key)!.push(task)
   }
+
+  // ---- Sort tag groups ----
+  const tagEntries = Array.from(tasksByTag.entries())
+  tagEntries.sort((a, b) => {
+    const [tagIdA, tasksA] = a
+    const [tagIdB, tasksB] = b
+    const tagA = tags.find((t) => t.id === tagIdA)
+    const tagB = tags.find((t) => t.id === tagIdB)
+
+    if (ganttSortBy === 'name') {
+      const nameA = tagA?.name ?? 'Other'
+      const nameB = tagB?.name ?? 'Other'
+      return nameA.localeCompare(nameB)
+    }
+    if (ganttSortBy === 'created_at') {
+      const createdA = tagA?.created_at ?? ''
+      const createdB = tagB?.created_at ?? ''
+      return createdB.localeCompare(createdA)
+    }
+    // earliest (default)
+    const earliestA = Math.min(...tasksA.map((t) => {
+      const ps = getDayIndex(t.planned_start)
+      const as = getDayIndex(t.actual_start)
+      if (ps >= 0 && as >= 0) return Math.min(ps, as)
+      return ps >= 0 ? ps : (as >= 0 ? as : Infinity)
+    }))
+    const earliestB = Math.min(...tasksB.map((t) => {
+      const ps = getDayIndex(t.planned_start)
+      const as = getDayIndex(t.actual_start)
+      if (ps >= 0 && as >= 0) return Math.min(ps, as)
+      return ps >= 0 ? ps : (as >= 0 ? as : Infinity)
+    }))
+    if (earliestA === Infinity && earliestB === Infinity) return 0
+    if (earliestA === Infinity) return 1
+    if (earliestB === Infinity) return -1
+    return earliestA - earliestB
+  })
+
+  // ---- Per-group row assignment ----
+  interface GroupInfo {
+    tagId: number | null
+    tag: Tag | undefined
+    plannedRows: Map<number, number>
+    actualRows: Map<number, number>
+    maxPlannedRow: number
+    maxActualRow: number
+    height: number
+    yOffset: number
+  }
+
+  const groups: GroupInfo[] = []
+  let currentYOffset = 0
+
+  for (const [tagId, groupTasks] of tagEntries) {
+    const planned = groupTasks.filter((t) => t.planned_start && t.planned_end)
+    const actual = groupTasks.filter((t) => t.actual_start && t.actual_end)
+
+    const plannedRows = assignRows(planned, 'planned_start', 'planned_end')
+    const actualRows = assignRows(actual, 'actual_start', 'actual_end')
+
+    const maxPlanned = planned.length > 0
+      ? Math.max(...planned.map((t) => plannedRows.get(t.id) ?? 0)) + 1
+      : 0
+    const maxActual = actual.length > 0
+      ? Math.max(...actual.map((t) => actualRows.get(t.id) ?? 0)) + 1
+      : 0
+
+    const isCollapsed = collapsedTagIds.includes(tagId ?? -1)
+    const taskHeight = isCollapsed
+      ? 0
+      : maxPlanned * (BLOCK_HEIGHT + BLOCK_GAP) + maxActual * (BLOCK_HEIGHT + BLOCK_GAP)
+
+    const height = GROUP_HEADER_HEIGHT + taskHeight + GROUP_GAP
+
+    groups.push({
+      tagId,
+      tag: tags.find((t) => t.id === tagId),
+      plannedRows,
+      actualRows,
+      maxPlannedRow: maxPlanned,
+      maxActualRow: maxActual,
+      height,
+      yOffset: currentYOffset,
+    })
+
+    currentYOffset += height
+  }
+
+  const canvasHeight = ROW_OFFSET + currentYOffset + 40
 
   // ---- Drag handlers (only for planned blocks in plan/both mode) ----
   const handleMouseDown = useCallback(
@@ -201,7 +276,6 @@ export function TimeCanvas() {
     let left = startIdx * DAY_WIDTH
     let width = (endIdx - startIdx) * DAY_WIDTH
 
-    // Apply drag preview (only for planned blocks)
     if (dragState && dragState.taskId === task.id && startKey === 'planned_start') {
       if (dragState.currentStart !== undefined) {
         left = dragState.currentStart * DAY_WIDTH
@@ -214,14 +288,14 @@ export function TimeCanvas() {
     return {
       position: 'absolute',
       left,
-      top: ROW_OFFSET + rowOffset + row * (BLOCK_HEIGHT + BLOCK_GAP),
+      top: rowOffset + row * (BLOCK_HEIGHT + BLOCK_GAP),
       width: Math.max(width, DAY_WIDTH),
       height: BLOCK_HEIGHT,
     }
   }
 
-  const projectColor = (pid: number | null) =>
-    projects.find((p) => p.id === pid)?.color ?? '#4b5563'
+  const tagColor = (tid: number | null) =>
+    tags.find((t) => t.id === tid)?.color ?? '#4b5563'
 
   const renderBlock = (task: Task, startKey: keyof Task, endKey: keyof Task, rowMap: Map<number, number>, rowOffset: number = 0) => {
     const isPlanned = startKey === 'planned_start'
@@ -233,8 +307,8 @@ export function TimeCanvas() {
         }`}
         style={{
           ...getTaskStyle(task, startKey, endKey, rowMap, rowOffset),
-          backgroundColor: projectColor(task.project_id) + (isPlanned ? '26' : 'ff'),
-          borderColor: projectColor(task.project_id) + (isPlanned ? '40' : 'ff'),
+          backgroundColor: tagColor(task.major_tag_id) + (isPlanned ? '26' : 'ff'),
+          borderColor: tagColor(task.major_tag_id) + (isPlanned ? '40' : 'ff'),
           color: isPlanned ? '#141413' : '#faf9f5',
         }}
         onMouseDown={isPlanned ? (e) => handleMouseDown(e, task, 'move') : undefined}
@@ -310,6 +384,25 @@ export function TimeCanvas() {
           ))}
         </div>
 
+        {/* Toolbar: sort + expand all */}
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-[#f0eee6] bg-[#faf9f5]">
+          <select
+            value={ganttSortBy}
+            onChange={(e) => setGanttSortBy(e.target.value as GanttSortBy)}
+            className="px-2 py-1 text-xs rounded-lg border border-[#e8e6dc] bg-white text-[#141413] focus:outline-none focus:border-[#3898ec]"
+          >
+            <option value="earliest">Sort: Earliest task</option>
+            <option value="name">Sort: Tag name</option>
+            <option value="created_at">Sort: Created at</option>
+          </select>
+          <button
+            onClick={expandAllTags}
+            className="px-2 py-1 text-xs rounded-lg border border-[#e8e6dc] bg-white text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed] transition-colors"
+          >
+            Expand all
+          </button>
+        </div>
+
         {/* Unscheduled tasks area */}
         <div className="px-2 py-3 border-b border-[#f0eee6]">
           <div className="text-[11px] text-[#87867f] mb-2 uppercase tracking-[0.5px]">Inbox / Unscheduled</div>
@@ -331,7 +424,7 @@ export function TimeCanvas() {
           </div>
         </div>
 
-        {/* Canvas area with grid + blocks */}
+        {/* Canvas area with grid + grouped blocks */}
         <div className="relative" style={{ height: canvasHeight }}>
           {/* Day column backgrounds */}
           <div className="absolute inset-0 flex">
@@ -361,38 +454,74 @@ export function TimeCanvas() {
             })}
           </div>
 
-          {/* Planned blocks */}
-          {(canvasMode === 'plan' || canvasMode === 'both') &&
-            plannedTasks.map((task) =>
-              renderBlock(task, 'planned_start', 'planned_end', plannedRows, 0)
-            )}
+          {/* Tag groups */}
+          {groups.map((group) => {
+            const isCollapsed = collapsedTagIds.includes(group.tagId ?? -1)
+            const groupTop = ROW_OFFSET + group.yOffset
+            const taskAreaTop = groupTop + GROUP_HEADER_HEIGHT
 
-          {/* Actual blocks */}
-          {(canvasMode === 'actual' || canvasMode === 'both') &&
-            actualTasks.map((task) =>
-              renderBlock(
-                task,
-                'actual_start',
-                'actual_end',
-                actualRows,
-                canvasMode === 'both' ? maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP) + 20 : 0
-              )
-            )}
+            return (
+              <div key={group.tagId ?? 'none'}>
+                {/* Group header */}
+                <div
+                  className="absolute left-0 right-0 flex items-center gap-2 px-3 cursor-pointer select-none hover:bg-[rgba(0,0,0,0.02)]"
+                  style={{
+                    top: groupTop,
+                    height: GROUP_HEADER_HEIGHT,
+                  }}
+                  onClick={() => toggleTagCollapse(group.tagId ?? -1)}
+                >
+                  <span className="text-[10px] text-[#87867f]">
+                    {isCollapsed ? '▶' : '▼'}
+                  </span>
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: group.tag?.color ?? '#87867f' }}
+                  />
+                  <span className="text-[11px] font-semibold text-[#141413]">
+                    {group.tag?.name ?? 'Other'}
+                  </span>
+                  {isCollapsed && (
+                    <span className="text-[10px] text-[#b0aea5]">
+                      ({group.plannedRows.size + group.actualRows.size} tasks hidden)
+                    </span>
+                  )}
+                </div>
 
-          {/* Both mode: separator label */}
-          {canvasMode === 'both' && actualTasks.length > 0 && (
-            <div
-              className="absolute left-2 text-[10px] text-[#b0aea5] uppercase tracking-[1px]"
-              style={{ top: ROW_OFFSET + maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP) + 4 }}
-            >
-              Actual
-            </div>
-          )}
+                {/* Task blocks */}
+                {!isCollapsed && (
+                  <>
+                    {(canvasMode === 'plan' || canvasMode === 'both') &&
+                      Array.from(tasksByTag.get(group.tagId) ?? [])
+                        .filter((t) => t.planned_start && t.planned_end)
+                        .map((task) =>
+                          renderBlock(task, 'planned_start', 'planned_end', group.plannedRows, taskAreaTop)
+                        )}
+
+                    {(canvasMode === 'actual' || canvasMode === 'both') &&
+                      Array.from(tasksByTag.get(group.tagId) ?? [])
+                        .filter((t) => t.actual_start && t.actual_end)
+                        .map((task) =>
+                          renderBlock(
+                            task,
+                            'actual_start',
+                            'actual_end',
+                            group.actualRows,
+                            taskAreaTop + group.maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP)
+                          )
+                        )}
+                  </>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
   )
 }
+
+type GanttSortBy = 'earliest' | 'name' | 'created_at'
 
 interface DragState {
   taskId: number
