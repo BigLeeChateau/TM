@@ -6,14 +6,14 @@ function formatHours(totalSeconds: number): string {
   return `${hours}h`
 }
 
-export function ProjectList() {
-  const { projects, selectedProjectId, setSelectedProject, createProject, projectTimeSummaries } = useStore()
+export function TagList() {
+  const { tags, selectedTagId, setSelectedTag, createTag, tagTimeSummaries } = useStore()
   const [isAdding, setIsAdding] = useState(false)
   const [newName, setNewName] = useState('')
 
   const handleCreate = async () => {
     if (!newName.trim()) return
-    await createProject({ name: newName.trim() })
+    await createTag({ name: newName.trim() })
     setNewName('')
     setIsAdding(false)
   }
@@ -21,27 +21,27 @@ export function ProjectList() {
   return (
     <div className="flex-1 overflow-auto">
       <div className="px-3 py-2 text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">
-        Projects
+        Tags
       </div>
       <div className="space-y-0.5 px-2">
-        {projects.map((project) => (
+        {tags.map((tag) => (
           <button
-            key={project.id}
-            onClick={() => setSelectedProject(project.id === selectedProjectId ? null : project.id)}
+            key={tag.id}
+            onClick={() => setSelectedTag(tag.id === selectedTagId ? null : tag.id)}
             className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors text-left ${
-              project.id === selectedProjectId
+              tag.id === selectedTagId
                 ? 'bg-[#f5f4ed] text-[#141413] font-medium'
                 : 'text-[#4d4c48] hover:bg-[#f5f4ed]'
             }`}
           >
             <span
               className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-              style={{ backgroundColor: project.color }}
+              style={{ backgroundColor: tag.color }}
             />
-            <span className="truncate flex-1">{project.name}</span>
-            {projectTimeSummaries[project.id] > 0 && (
+            <span className="truncate flex-1">{tag.name}</span>
+            {tagTimeSummaries[tag.id] > 0 && (
               <span className="text-xs text-[#b0aea5] flex-shrink-0 font-mono tabular-nums">
-                {formatHours(projectTimeSummaries[project.id])}
+                {formatHours(tagTimeSummaries[tag.id])}
               </span>
             )}
           </button>
@@ -65,7 +65,7 @@ export function ProjectList() {
                   setIsAdding(false)
                 }
               }}
-              placeholder="Project name"
+              placeholder="Tag name"
               className="w-full px-2 py-1 bg-white border border-[#e8e6dc] rounded-lg text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
             />
           </div>
@@ -75,7 +75,7 @@ export function ProjectList() {
             className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[#b0aea5] hover:text-[#4d4c48] hover:bg-[#f5f4ed] transition-colors text-left"
           >
             <span className="text-lg leading-none">+</span>
-            <span>New Project</span>
+            <span>New Tag</span>
           </button>
         )}
       </div>
