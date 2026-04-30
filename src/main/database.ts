@@ -174,7 +174,7 @@ function createTables(): void {
       title TEXT NOT NULL,
       description TEXT DEFAULT '',
       status TEXT DEFAULT 'inbox' CHECK(status IN ('inbox', 'next', 'waiting', 'done')),
-      project_id INTEGER REFERENCES projects(id) ON DELETE RESTRICT,
+      major_tag_id INTEGER REFERENCES tags(id) ON DELETE RESTRICT,
       planned_start TEXT,
       planned_end TEXT,
       planned_duration REAL,
@@ -204,7 +204,7 @@ function createTables(): void {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
-    CREATE INDEX IF NOT EXISTS idx_tasks_project ON tasks(project_id);
+    CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id);
     CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
     CREATE INDEX IF NOT EXISTS idx_tasks_deleted ON tasks(deleted_at);
     CREATE INDEX IF NOT EXISTS idx_mutations_task ON task_mutations(task_id);
@@ -234,8 +234,6 @@ function createTables(): void {
       tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
       UNIQUE(task_id, tag_id)
     );
-
-    CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id);
   `)
 }
 
