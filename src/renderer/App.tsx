@@ -1,16 +1,16 @@
 import { useEffect } from 'react'
 import { useStore } from './store'
-import { ProjectList } from './components/ProjectList'
+import { TagList } from './components/TagList'
 import { TaskList } from './components/TaskList'
 import { TimeCanvas } from './components/TimeCanvas'
 import { TaskModal } from './components/TaskModal'
 import { Onboarding } from './components/Onboarding'
 
 export default function App() {
-  const { view, setView, loadProjects, loadTasks, editingTaskId, setEditingTaskId, tasks } = useStore()
+  const { view, setView, loadTags, loadTasks, editingTaskId, setEditingTaskId, tasks } = useStore()
 
   useEffect(() => {
-    loadProjects()
+    loadTags()
     loadTasks()
   }, [])
 
@@ -21,7 +21,7 @@ export default function App() {
         <div className="p-4 border-b border-[#f0eee6]">
           <h1 className="font-[Georgia] text-[28px] font-medium text-[#141413]">TM</h1>
         </div>
-        <ProjectList />
+        <TagList />
         <div className="border-t border-[#f0eee6]" />
         <TaskList />
       </aside>
@@ -87,9 +87,9 @@ export default function App() {
 }
 
 function ListView() {
-  const { tasks, projects } = useStore()
-  const getProjectName = (pid: number | null) =>
-    projects.find((p) => p.id === pid)?.name || 'Inbox'
+  const { tasks, tags } = useStore()
+  const getTagName = (tid: number | null) =>
+    tags.find((t) => t.id === tid)?.name || 'Other'
 
   return (
     <div className="p-4 overflow-auto h-full">
@@ -102,7 +102,7 @@ function ListView() {
           >
             <StatusBadge status={task.status} />
             <span className="flex-1">{task.title}</span>
-            <span className="text-xs text-[#87867f]">{getProjectName(task.project_id)}</span>
+            <span className="text-xs text-[#87867f]">{getTagName(task.major_tag_id)}</span>
           </div>
         ))}
       </div>
@@ -111,7 +111,7 @@ function ListView() {
 }
 
 function DashboardView() {
-  const { tasks, projects } = useStore()
+  const { tasks, tags } = useStore()
   const doneCount = tasks.filter((t) => t.status === 'done').length
   const totalCount = tasks.length
 
@@ -119,7 +119,7 @@ function DashboardView() {
     <div className="p-4 overflow-auto h-full">
       <h2 className="text-lg font-medium mb-4">Dashboard</h2>
       <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Projects" value={projects.length} />
+        <StatCard label="Tags" value={tags.length} />
         <StatCard label="Total Tasks" value={totalCount} />
         <StatCard label="Done" value={doneCount} />
       </div>

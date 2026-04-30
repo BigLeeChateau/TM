@@ -1,48 +1,48 @@
-import type { Project, Task, CreateProjectInput, UpdateProjectInput, CreateTaskInput, UpdateTaskInput, TimeEntry } from '../shared/types'
+import type { Tag, Task, CreateTagInput, UpdateTagInput, CreateTaskInput, UpdateTaskInput, TimeEntry } from '../shared/types'
 
 function loadMockData() {
   try {
     const saved = localStorage.getItem('tm_mock_data')
     if (saved) return JSON.parse(saved)
   } catch { /* ignore */ }
-  return { projects: [], tasks: [], nextProjectId: 1, nextTaskId: 1 }
+  return { tags: [], tasks: [], nextTagId: 1, nextTaskId: 1 }
 }
 
 function saveMockData() {
   localStorage.setItem('tm_mock_data', JSON.stringify({
-    projects: mockProjects,
+    tags: mockTags,
     tasks: mockTasks,
     timeEntries: mockTimeEntries,
-    nextProjectId,
+    nextTagId,
     nextTaskId,
     nextTimeEntryId,
   }))
 }
 
 const initial = loadMockData()
-let mockProjects: Project[] = initial.projects
+let mockTags: Tag[] = initial.tags
 let mockTasks: Task[] = initial.tasks
-let nextProjectId = initial.nextProjectId
+let nextTagId = initial.nextTagId
 let nextTaskId = initial.nextTaskId
 let mockTimeEntries: TimeEntry[] = initial.timeEntries ?? []
 let nextTimeEntryId = initial.nextTimeEntryId ?? 1
 
-// Ensure default "Other" project exists
-if (!mockProjects.some((p) => p.name === 'Other')) {
-  const otherProject: Project = {
-    id: nextProjectId++,
+// Ensure default "Other" tag exists
+if (!mockTags.some((t) => t.name === 'Other')) {
+  const otherTag: Tag = {
+    id: nextTagId++,
     name: 'Other',
     description: '',
     color: '#87867f',
     created_at: new Date().toISOString(),
   }
-  mockProjects.push(otherProject)
+  mockTags.push(otherTag)
   saveMockData()
 }
 
-function getDefaultProjectId(): number {
-  const other = mockProjects.find((p) => p.name === 'Other')
-  if (!other) throw new Error("Default 'Other' project not found")
+function getDefaultTagId(): number {
+  const other = mockTags.find((t) => t.name === 'Other')
+  if (!other) throw new Error("Default 'Other' tag not found")
   return other.id
 }
 
@@ -54,42 +54,50 @@ function computeDuration(start: string | null | undefined, end?: string | null |
   return days * 8
 }
 
-function createProject(data: CreateProjectInput): Promise<Project> {
-  const project: Project = {
-    id: nextProjectId++,
+function createTag(data: CreateTagInput): Promise<Tag> {
+  const tag: Tag = {
+    id: nextTagId++,
     name: data.name,
     description: data.description || '',
     color: data.color || '#3b82f6',
     created_at: new Date().toISOString(),
   }
-  mockProjects.push(project)
+  mockTags.push(tag)
   saveMockData()
-  return Promise.resolve(project)
+  return Promise.resolve(tag)
 }
 
-function updateProject(id: number, data: UpdateProjectInput): Promise<Project> {
-  const p = mockProjects.find((x) => x.id === id)
-  if (!p) throw new Error('Not found')
-  if (data.name !== undefined) p.name = data.name
-  if (data.description !== undefined) p.description = data.description
-  if (data.color !== undefined) p.color = data.color
+function updateTag(id: number, data: UpdateTagInput): Promise<Tag> {
+  const t = mockTags.find((x) => x.id === id)
+  if (!t) throw new Error('Not found')
+  if (data.name !== undefined) t.name = data.name
+  if (data.description !== undefined) t.description = data.description
+  if (data.color !== undefined) t.color = data.color
   saveMockData()
-  return Promise.resolve(p)
+  return Promise.resolve(t)
 }
 
-function deleteProject(id: number): Promise<void> {
-  const defaultId = getDefaultProjectId()
+function deleteTag(id: number): Promise<void> {
+  const defaultId = getDefaultTagId()
   if (id === defaultId) {
-    throw new Error("Cannot delete the default 'Other' project")
+    throw new Error("Cannot delete the default 'Other' tag")
   }
-  mockProjects = mockProjects.filter((p) => p.id !== id)
-  mockTasks = mockTasks.map((t) => (t.project_id === id ? { ...t, project_id: defaultId } : t))
+  mockTags = mockTags.filter((t) => t.id !== id)
+  mockTasks = mockTasks.map((t) => (t.major_tag_id === id ? { ...t, major_tag_id: defaultId } as Task : t))
   saveMockData()
   return Promise.resolve()
 }
 
-function listProjects(): Promise<Project[]> {
-  return Promise.resolve([...mockProjects])
+function listTags(): Promise<Tag[]> {
+  return Promise.resolve([...mockTags])
+}
+
+function listTaskTags(_taskId: number): Promise<Tag[]> {
+  return Promise.resolve([])
+}
+
+function setTaskTags(_taskId: number, _tagIds: number[]): Promise<void> {
+  return Promise.resolve()
 }
 
 function createTask(data: CreateTaskInput): Promise<Task> {
@@ -98,7 +106,7 @@ function createTask(data: CreateTaskInput): Promise<Task> {
     title: data.title,
     description: data.description || '',
     status: data.status || 'inbox',
-    project_id: data.project_id ?? getDefaultProjectId(),
+    major_tag_id: data.major_tag_id ?? getDefaultTagId(),
     planned_start: data.planned_start ?? null,
     planned_end: data.planned_end ?? null,
     planned_duration: data.planned_duration ?? null,
@@ -140,10 +148,10 @@ function deleteTask(id: number): Promise<void> {
   return Promise.resolve()
 }
 
-function listTasks(projectId?: number | null, status?: string): Promise<Task[]> {
+function listTasks(majorTagId?: number | null, status?: string): Promise<Task[]> {
   let result = [...mockTasks]
-  if (projectId !== undefined) {
-    result = result.filter((t) => t.project_id === projectId)
+  if (majorTagId !== undefined) {
+    result = result.filter((t) => t.major_tag_id === majorTagId)
   }
   if (status) {
     result = result.filter((t) => t.status === status)
@@ -165,8 +173,8 @@ function redo(): Promise<{ success: boolean; task?: Task }> {
   return Promise.resolve({ success: false })
 }
 
-function exportData(): Promise<{ projects: Project[]; tasks: Task[] }> {
-  return Promise.resolve({ projects: [...mockProjects], tasks: [...mockTasks] })
+function exportData(): Promise<{ tags: Tag[]; tasks: Task[] }> {
+  return Promise.resolve({ tags: [...mockTags], tasks: [...mockTasks] })
 }
 
 function toggleTaskTimer(taskId: number): Promise<Task> {
@@ -209,9 +217,9 @@ function listTimeEntries(taskId: number): Promise<TimeEntry[]> {
   )
 }
 
-function getProjectTimeSummary(projectId: number): Promise<{ total_seconds: number }> {
+function getTagTimeSummary(tagId: number): Promise<{ total_seconds: number }> {
   let total = 0
-  const tasks = mockTasks.filter((t) => t.project_id === projectId)
+  const tasks = mockTasks.filter((t) => t.major_tag_id === tagId)
   for (const t of tasks) {
     total += t.timer_accumulated
     if (t.timer_running && t.timer_started_at) {
@@ -223,10 +231,12 @@ function getProjectTimeSummary(projectId: number): Promise<{ total_seconds: numb
 }
 
 export const mockElectronAPI = {
-  createProject,
-  updateProject,
-  deleteProject,
-  listProjects,
+  createTag,
+  updateTag,
+  deleteTag,
+  listTags,
+  listTaskTags,
+  setTaskTags,
   createTask,
   updateTask,
   deleteTask,
@@ -236,5 +246,5 @@ export const mockElectronAPI = {
   exportData,
   toggleTaskTimer,
   listTimeEntries,
-  getProjectTimeSummary,
+  getTagTimeSummary,
 }
