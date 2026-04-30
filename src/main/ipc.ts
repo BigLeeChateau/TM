@@ -33,6 +33,9 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('updateTag', (_event, id: number, data: UpdateTagInput): Tag => {
     const db = getDb()
+    if (Object.keys(data).length === 0) {
+      return db.prepare('SELECT * FROM tags WHERE id = ?').get(id) as Tag
+    }
     const sets: string[] = []
     const values: (string | number)[] = []
     if (data.name !== undefined) { sets.push('name = ?'); values.push(data.name) }
