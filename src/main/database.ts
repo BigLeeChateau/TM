@@ -30,6 +30,8 @@ export function initDatabase(): void {
   createTables()
   migrateTasksForeignKey()
   migrateProjectsToTags()
+  // Create index after migration so column is guaranteed to exist
+  db.prepare('CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id)').run()
   ensureDefaultTag()
   migrateTimerColumns()
   ensureBackupDir()
@@ -204,7 +206,6 @@ function createTables(): void {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
-    CREATE INDEX IF NOT EXISTS idx_tasks_major_tag ON tasks(major_tag_id);
     CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
     CREATE INDEX IF NOT EXISTS idx_tasks_deleted ON tasks(deleted_at);
     CREATE INDEX IF NOT EXISTS idx_mutations_task ON task_mutations(task_id);
