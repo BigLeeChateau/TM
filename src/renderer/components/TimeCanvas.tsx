@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import type { MouseEvent as ReactMouseEvent, CSSProperties } from 'react'
 import { useStore } from '../store'
-import type { Task, Tag } from '../../shared/types'
+import type { Task, Tag, UpdateTaskInput } from '../../shared/types'
 
 const DAY_WIDTH = 80
 const HEADER_HEIGHT = 56
@@ -196,16 +196,18 @@ export function TimeCanvas() {
 
   // ---- Drag handlers (only for planned blocks in plan/both mode) ----
   const handleMouseDown = useCallback(
-    (e: ReactMouseEvent, task: Task, mode: 'move' | 'resize') => {
+    (e: ReactMouseEvent, task: Task, mode: 'move' | 'resize', startField: 'planned_start' | 'actual_start', endField: 'planned_end' | 'actual_end') => {
       e.preventDefault()
       const rect = canvasRef.current?.getBoundingClientRect()
       if (!rect) return
       const startX = e.clientX - rect.left
-      const startIdx = getDayIndex(task.planned_start)
-      const endIdx = getDayIndex(task.planned_end)
+      const startIdx = getDayIndex(task[startField])
+      const endIdx = getDayIndex(task[endField])
       setDragState({
         taskId: task.id,
         mode,
+        startField,
+        endField,
         startX,
         startIdx,
         endIdx,
@@ -239,21 +241,21 @@ export function TimeCanvas() {
 
     const handleMouseUp = async () => {
       if (!dragState) return
-      const { taskId, mode, currentStart, currentEnd } = dragState
+      const { taskId, mode, currentStart, currentEnd, startField, endField } = dragState
       if (currentStart !== undefined || currentEnd !== undefined) {
         if (mode === 'move' && currentStart !== undefined) {
           const duration = dragState.endIdx - dragState.startIdx
           const newStartDate = getDateFromIndex(currentStart)
           const newEndDate = getDateFromIndex(currentStart + duration)
           await updateTask(taskId, {
-            planned_start: newStartDate,
-            planned_end: newEndDate,
-          })
+            [startField]: newStartDate,
+            [endField]: newEndDate,
+          } as UpdateTaskInput)
         } else if (mode === 'resize' && currentEnd !== undefined) {
           const newEndDate = getDateFromIndex(currentEnd)
           await updateTask(taskId, {
-            planned_end: newEndDate,
-          })
+            [endField]: newEndDate,
+          } as UpdateTaskInput)
         }
       }
       setDragState(null)
@@ -287,7 +289,7 @@ export function TimeCanvas() {
     let left = startIdx * DAY_WIDTH
     let width = (endIdx - startIdx) * DAY_WIDTH
 
-    if (dragState && dragState.taskId === task.id && startKey === 'planned_start') {
+    if (dragState && dragState.taskId === task.id && startKey === dragState.startField) {
       if (dragState.currentStart !== undefined) {
         left = dragState.currentStart * DAY_WIDTH
         width = (dragState.currentEnd! - dragState.currentStart) * DAY_WIDTH
@@ -307,31 +309,35 @@ export function TimeCanvas() {
 
   const renderBlock = (task: Task, startKey: keyof Task, endKey: keyof Task, rowMap: Map<number, number>, rowOffset: number = 0) => {
     const isPlanned = startKey === 'planned_start'
+    const startField = isPlanned ? 'planned_start' as const : 'actual_start' as const
+    const endField = isPlanned ? 'planned_end' as const : 'actual_end' as const
+    const isDragging = dragState?.taskId === task.id && dragState?.startField === startField
+
     return (
       <div
         key={`${task.id}-${String(startKey)}`}
-        className={`absolute rounded-lg px-2 py-1 text-xs font-medium select-none cursor-move overflow-hidden whitespace-nowrap border ${
+        className={`absolute rounded-lg px-2 py-1 text-xs font-medium select-none cursor-move overflow-hidden whitespace-nowrap border transition-shadow ${
           task.status === 'done' ? 'opacity-40' : ''
-        }`}
+        } ${isDragging ? 'shadow-lg z-20' : 'z-10'}`}
         style={{
           ...getTaskStyle(task, startKey, endKey, rowMap, rowOffset),
           backgroundColor: tagColor(task.major_tag_id) + (isPlanned ? '26' : 'ff'),
           borderColor: tagColor(task.major_tag_id) + (isPlanned ? '40' : 'ff'),
           color: isPlanned ? '#141413' : '#faf9f5',
         }}
-        onMouseDown={isPlanned ? (e) => handleMouseDown(e, task, 'move') : undefined}
+        onMouseDown={(e) => handleMouseDown(e, task, 'move', startField, endField)}
         onDoubleClick={() => setEditingTaskId(task.id)}
       >
         <span>{task.title}</span>
-        {isPlanned && (
-          <div
-            className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-[#141413]/10"
-            onMouseDown={(e) => {
-              e.stopPropagation()
-              handleMouseDown(e, task, 'resize')
-            }}
-          />
-        )}
+        <div
+          className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize flex items-center justify-center group"
+          onMouseDown={(e) => {
+            e.stopPropagation()
+            handleMouseDown(e, task, 'resize', startField, endField)
+          }}
+        >
+          <div className="w-[3px] h-4 rounded-full bg-current opacity-0 group-hover:opacity-30 transition-opacity" />
+        </div>
       </div>
     )
   }
@@ -534,6 +540,8 @@ type GanttSortBy = 'earliest' | 'name' | 'created_at'
 interface DragState {
   taskId: number
   mode: 'move' | 'resize'
+  startField: 'planned_start' | 'actual_start'
+  endField: 'planned_end' | 'actual_end'
   startX: number
   startIdx: number
   endIdx: number
