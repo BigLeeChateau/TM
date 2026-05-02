@@ -225,7 +225,7 @@ export function TimeCanvas() {
       if (!canvasRef.current) return
       const rect = canvasRef.current.getBoundingClientRect()
       const x = e.clientX - rect.left
-      const { mode, startIdx, endIdx, offsetX } = dragState
+      const { mode, startIdx, endIdx, offsetX, startX, edge } = dragState
 
       if (mode === 'move') {
         const rawIdx = Math.round((x - offsetX) / DAY_WIDTH)
@@ -234,9 +234,15 @@ export function TimeCanvas() {
         const newEnd = newStart + duration
         setDragState((s) => (s ? { ...s, currentStart: newStart, currentEnd: newEnd } : null))
       } else {
-        const rawEnd = Math.round(x / DAY_WIDTH)
-        const newEnd = Math.max(startIdx + 1, rawEnd)
-        setDragState((s) => (s ? { ...s, currentEnd: newEnd } : null))
+        const deltaX = x - startX
+        const deltaDays = Math.sign(deltaX) * Math.round(Math.abs(deltaX) / DAY_WIDTH)
+        if (edge === 'left') {
+          const newStart = Math.min(endIdx - 1, Math.max(0, startIdx + deltaDays))
+          setDragState((s) => (s ? { ...s, currentStart: newStart } : null))
+        } else {
+          const newEnd = Math.max(startIdx + 1, endIdx + deltaDays)
+          setDragState((s) => (s ? { ...s, currentEnd: newEnd } : null))
+        }
       }
     }
 
