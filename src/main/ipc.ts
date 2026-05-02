@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import { getDb, snapshotDatabase, getDefaultTagId, DEFAULT_TAG_NAME } from './database'
+import { getTodayLocal, validateActualDates, computeActualDatesFromTimer } from '../shared/actual-date-utils'
 import type {
   Tag,
   Task,
@@ -208,7 +209,13 @@ export function registerIpcHandlers(): void {
       if (!task) throw new Error(`Task ${id} not found`)
 
       if (task.timer_running) {
-        const startedAt = new Date(task.timer_started_at!)
+        if (!task.timer_started_at) {
+          throw new Error(`Task ${id} has timer_running=true but no timer_started_at`)
+        }
+        const startedAt = new Date(task.timer_started_at)
+        if (isNaN(startedAt.getTime())) {
+          throw new Error(`Invalid timer_started_at for task ${id}`)
+        }
         const now = new Date()
         const elapsedSeconds = Math.round((now.getTime() - startedAt.getTime()) / 1000)
 
@@ -222,11 +229,15 @@ export function registerIpcHandlers(): void {
           throw new Error(`No open time entry found for task ${id}`)
         }
 
+        const { actual_start, actual_end } = computeActualDatesFromTimer(task.timer_started_at!, now.toISOString())
+        const actualDuration = computeDuration(actual_start, actual_end)
+
         db.prepare(`
           UPDATE tasks
-          SET timer_running = 0, timer_started_at = NULL, timer_accumulated = timer_accumulated + ?
+          SET timer_running = 0, timer_started_at = NULL, timer_accumulated = timer_accumulated + ?,
+              actual_start = ?, actual_end = ?, actual_duration = ?
           WHERE id = ?
-        `).run(elapsedSeconds, id)
+        `).run(elapsedSeconds, actual_start, actual_end, actualDuration, id)
       } else {
         const now = new Date().toISOString()
         db.prepare(`
