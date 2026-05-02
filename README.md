@@ -6,6 +6,15 @@ TM is a desktop app that bridges intention and execution. It combines GTD-style 
 
 ![Poster](poster-preview.png)
 
+## Download
+
+| Platform | Download |
+|----------|----------|
+| macOS | [TM-0.1.0.dmg]() |
+| Windows | [TM-0.1.0.exe]() |
+
+Or clone the repo and build from source — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Why TM?
 
 Most task managers help you list work. TM helps you *feel* time.
@@ -42,67 +51,9 @@ Group tasks by a major tag. Each tag shows total hours worked across all its tas
 ### Actual Date Guardrails
 Actual dates cannot be set to future dates — enforced in both the UI and the data layer. This keeps your tracked time grounded in reality.
 
-## Tech Stack
+## Supported Languages
 
-- **Electron** — Cross-platform desktop shell
-- **React + TypeScript** — UI layer
-- **Vite** — Build tooling
-- **Tailwind CSS** — Styling
-- **Zustand** — State management
-- **better-sqlite3** — Local database (WAL mode)
-- **i18n** — English, 简体中文, Français, Español, Deutsch, 日本語, Русский
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Run in development mode (Electron + Vite)
-npm run dev
-
-# Or run just the renderer in a browser (uses mock data)
-npx vite
-
-# Build for production
-npm run build
-
-# Package the app
-npm run dist
-```
-
-## Project Structure
-
-```
-src/
-  main/           # Electron main process
-    index.ts      # App lifecycle, window creation
-    database.ts   # SQLite schema and migrations
-    ipc.ts        # IPC handlers for all operations
-  preload/        # Context bridge for secure IPC
-  renderer/       # React frontend
-    components/   # UI components
-    store.ts      # Zustand store
-    i18n/         # Translations (7 languages)
-    dev-mock.ts   # Browser development mock API
-  shared/         # Shared types and utilities
-```
-
-## Data Model
-
-- **Tags** — name, color, description. Tasks have one major tag and optional secondary tags.
-- **Tasks** — title, status, major tag, planned/actual dates and durations, timer state
-- **Time Entries** — full session log with start, end, and duration per task
-
-All data is stored locally in SQLite. No cloud, no accounts, no subscription.
-
-## Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Enter` | Confirm task/tag creation |
-| `Escape` | Cancel task/tag creation, close modal |
-| `Cmd/Ctrl + Z` | Undo last task update |
+English, 简体中文, Français, Español, Deutsch, 日本語, Русский
 
 ## Roadmap
 
