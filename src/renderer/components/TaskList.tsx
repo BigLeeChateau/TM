@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useStore } from '../store'
+import { useTranslation } from '../i18n'
 import type { TaskStatus } from '../../shared/types'
 import type { Task } from '../../shared/types'
 
@@ -36,14 +37,6 @@ function TimerDisplay({ task }: { task: Task }) {
   )
 }
 
-const statuses: { key: TaskStatus | 'all'; label: string }[] = [
-  { key: 'all', label: 'All Tasks' },
-  { key: 'inbox', label: 'Inbox' },
-  { key: 'next', label: 'Next' },
-  { key: 'waiting', label: 'Waiting' },
-  { key: 'done', label: 'Done' },
-]
-
 export function TaskList() {
   const {
     tasks,
@@ -56,6 +49,15 @@ export function TaskList() {
     setEditingTaskId,
     toggleTaskTimer,
   } = useStore()
+  const { t } = useTranslation()
+
+  const statuses: { key: TaskStatus | 'all'; label: string }[] = [
+    { key: 'all', label: t('allTasks') },
+    { key: 'inbox', label: t('inbox') },
+    { key: 'next', label: t('next') },
+    { key: 'waiting', label: t('waiting') },
+    { key: 'done', label: t('done') },
+  ]
 
   const [isAdding, setIsAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
@@ -82,7 +84,7 @@ export function TaskList() {
   return (
     <div className="flex-1 overflow-auto min-h-0">
       <div className="px-3 py-2 text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">
-        GTD
+        {t('gtd')}
       </div>
       <div className="space-y-0.5 px-2 mb-2">
         {statuses.map(({ key, label }) => (
@@ -133,7 +135,7 @@ export function TaskList() {
                   ? 'text-[#c96442]'
                   : 'text-[#b0aea5] hover:text-[#c96442]'
               }`}
-              title={task.timer_running ? 'Stop timer' : 'Start timer'}
+              title={task.timer_running ? t('stopTimer') : t('startTimer')}
             >
               {task.timer_running ? '⏸' : '▶'}
             </button>
@@ -185,7 +187,7 @@ export function TaskList() {
             onBlur={() => {
               if (!newTitle.trim()) setIsAdding(false)
             }}
-            placeholder="Task title"
+            placeholder={t('taskTitlePlaceholder')}
             className="w-full px-2 py-1.5 bg-white border border-[#e8e6dc] rounded-lg text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
           />
         ) : (
@@ -194,7 +196,7 @@ export function TaskList() {
             className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[#b0aea5] hover:text-[#4d4c48] hover:bg-[#f5f4ed] transition-colors text-left"
           >
             <span className="text-lg leading-none">+</span>
-            <span>New Task</span>
+            <span>{t('newTask')}</span>
           </button>
         )}
       </div>

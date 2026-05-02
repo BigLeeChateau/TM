@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useStore } from './store'
+import { useTranslation, LANGUAGE_LABELS } from './i18n'
 import { TagList } from './components/TagList'
 import { TaskList } from './components/TaskList'
 import { TimeCanvas } from './components/TimeCanvas'
@@ -7,10 +8,12 @@ import { TaskModal } from './components/TaskModal'
 import { Onboarding } from './components/Onboarding'
 
 export default function App() {
-  const { view, setView, loadTags, loadTasks, editingTaskId, setEditingTaskId, tasks } = useStore()
+  const { view, setView, loadTags, loadSecondaryTags, loadTasks, editingTaskId, setEditingTaskId, tasks } = useStore()
+  const { t, language, setLanguage } = useTranslation()
 
   useEffect(() => {
     loadTags()
+    loadSecondaryTags()
     loadTasks()
   }, [])
 
@@ -41,7 +44,7 @@ export default function App() {
                     : 'text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed]'
                 }`}
               >
-                {v}
+                {t(v)}
               </button>
             ))}
           </nav>
@@ -59,11 +62,20 @@ export default function App() {
             }}
             className="px-3 py-1.5 text-sm text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed] border border-[#e8e6dc] rounded-lg transition-colors"
           >
-            Export JSON
+            {t('exportJSON')}
           </button>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as typeof language)}
+            className="px-2 py-1.5 text-xs rounded-lg border border-[#e8e6dc] bg-white text-[#141413] focus:outline-none focus:border-[#3898ec] cursor-pointer"
+          >
+            {Object.entries(LANGUAGE_LABELS).map(([code, label]) => (
+              <option key={code} value={code}>{label}</option>
+            ))}
+          </select>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t('search')}
             className="w-48 px-3 py-1.5 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#9a9890]"
           />
         </header>
@@ -91,9 +103,11 @@ function ListView() {
   const getTagName = (tid: number | null) =>
     tags.find((t) => t.id === tid)?.name || 'Other'
 
+  const { t } = useTranslation()
+
   return (
     <div className="p-4 overflow-auto h-full">
-      <h2 className="text-lg font-medium mb-4">All Tasks</h2>
+      <h2 className="text-lg font-medium mb-4">{t('allTasks')}</h2>
       <div className="space-y-2">
         {tasks.map((task) => (
           <div
@@ -112,16 +126,17 @@ function ListView() {
 
 function DashboardView() {
   const { tasks, tags } = useStore()
+  const { t } = useTranslation()
   const doneCount = tasks.filter((t) => t.status === 'done').length
   const totalCount = tasks.length
 
   return (
     <div className="p-4 overflow-auto h-full">
-      <h2 className="text-lg font-medium mb-4">Dashboard</h2>
+      <h2 className="text-lg font-medium mb-4">{t('dashboard')}</h2>
       <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Tags" value={tags.length} />
-        <StatCard label="Total Tasks" value={totalCount} />
-        <StatCard label="Done" value={doneCount} />
+        <StatCard label={t('tags')} value={tags.length} />
+        <StatCard label={t('totalTasks')} value={totalCount} />
+        <StatCard label={t('done')} value={doneCount} />
       </div>
     </div>
   )

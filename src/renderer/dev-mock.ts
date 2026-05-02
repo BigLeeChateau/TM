@@ -92,6 +92,10 @@ function listTags(): Promise<Tag[]> {
   return Promise.resolve([...mockTags])
 }
 
+function listSecondaryTags(): Promise<Tag[]> {
+  return Promise.resolve([])
+}
+
 function listTaskTags(_taskId: number): Promise<Tag[]> {
   return Promise.resolve([])
 }
@@ -235,6 +239,7 @@ export const mockElectronAPI = {
   updateTag,
   deleteTag,
   listTags,
+  listSecondaryTags,
   listTaskTags,
   setTaskTags,
   createTask,

@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from '../i18n'
 
 const STORAGE_KEY = 'tm_onboarding_dismissed'
 
 export function Onboarding() {
+  const { t } = useTranslation()
   const [dismissed, setDismissed] = useState(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === 'true'
@@ -32,48 +34,48 @@ export function Onboarding() {
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-medium text-[#141413]">Welcome to TM</h2>
-            <p className="text-sm text-[#87867f]">Time-first project management</p>
+            <h2 className="text-lg font-medium text-[#141413]">{t('welcome')}</h2>
+            <p className="text-sm text-[#87867f]">{t('timeFirstProjectManagement')}</p>
           </div>
         </div>
 
         <div className="space-y-4 mb-6">
           <Step
             number={1}
-            title="Create tasks"
-            description="Click 'New Task' in the sidebar. Tasks start in Inbox."
+            title={t('step1Title')}
+            description={t('step1Desc')}
           />
           <Step
             number={2}
-            title="Organize with GTD"
-            description="Move tasks through statuses: Inbox → Next → Waiting → Done. Click the dot to cycle."
+            title={t('step2Title')}
+            description={t('step2Desc')}
           />
           <Step
             number={3}
-            title="Plan on the Canvas"
-            description="Drag tasks onto the timeline. Set planned start/end dates to visualize your schedule."
+            title={t('step3Title')}
+            description={t('step3Desc')}
           />
           <Step
             number={4}
-            title="Track actual time"
-            description="Click the play button to start a timer. Work sessions are logged automatically."
+            title={t('step4Title')}
+            description={t('step4Desc')}
           />
           <Step
             number={5}
-            title="Group by project"
-            description="Create projects to organize related tasks. Time rolls up per project automatically."
+            title={t('step5Title')}
+            description={t('step5Desc')}
           />
         </div>
 
         <div className="flex items-center justify-between pt-4 border-t border-[#f0eee6]">
           <p className="text-xs text-[#b0aea5]">
-            Tip: You can export your data anytime from the top bar.
+            {t('onboardingTip')}
           </p>
           <button
             onClick={handleDismiss}
             className="px-5 py-2 text-sm bg-[#c96442] text-[#faf9f5] rounded-lg hover:bg-[#d97757] transition-colors font-medium"
           >
-            Get Started
+            {t('getStarted')}
           </button>
         </div>
       </div>

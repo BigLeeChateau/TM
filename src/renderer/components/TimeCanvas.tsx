@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import type { MouseEvent as ReactMouseEvent, CSSProperties } from 'react'
 import { useStore } from '../store'
+import { useTranslation } from '../i18n'
 import type { Task, Tag, UpdateTaskInput } from '../../shared/types'
 
 const DAY_WIDTH = 80
@@ -14,6 +15,7 @@ const GROUP_GAP = 12
 
 export function TimeCanvas() {
   const { tasks, tags, updateTask, setEditingTaskId, canvasMode, setCanvasMode, collapsedTagIds, toggleTagCollapse, expandAllTags, ganttSortBy, setGanttSortBy } = useStore()
+  const { t } = useTranslation()
   const canvasRef = useRef<HTMLDivElement>(null)
   const [dragState, setDragState] = useState<DragState | null>(null)
   const draggedTaskIdRef = useRef<number | null>(null)
@@ -42,7 +44,10 @@ export function TimeCanvas() {
   const getDateFromIndex = (index: number) => {
     const d = new Date(startDate)
     d.setDate(d.getDate() + index)
-    return d.toISOString().split('T')[0]
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 
   // ---- Row assignment for overlap avoidance ----
@@ -112,8 +117,8 @@ export function TimeCanvas() {
       const tagB = tagById.get(tagIdB ?? -1)
 
       if (ganttSortBy === 'name') {
-        const nameA = tagA?.name ?? 'Other'
-        const nameB = tagB?.name ?? 'Other'
+        const nameA = tagA?.name ?? t('other')
+        const nameB = tagB?.name ?? t('other')
         return nameA.localeCompare(nameB)
       }
       if (ganttSortBy === 'created_at') {
@@ -198,9 +203,10 @@ export function TimeCanvas() {
   const handleMouseDown = useCallback(
     (e: ReactMouseEvent, task: Task, mode: 'move' | 'resize', startField: 'planned_start' | 'actual_start', endField: 'planned_end' | 'actual_end', edge?: 'left' | 'right') => {
       e.preventDefault()
-      const rect = canvasRef.current?.getBoundingClientRect()
-      if (!rect) return
-      const startX = e.clientX - rect.left
+      const canvas = canvasRef.current
+      const rect = canvas?.getBoundingClientRect()
+      if (!rect || !canvas) return
+      const startX = e.clientX - rect.left + canvas.scrollLeft
       const startIdx = getDayIndex(task[startField])
       const endIdx = getDayIndex(task[endField])
       setDragState({
@@ -224,8 +230,8 @@ export function TimeCanvas() {
     const handleMouseMove = (e: MouseEvent) => {
       if (!canvasRef.current) return
       const rect = canvasRef.current.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const { mode, startIdx, endIdx, offsetX, startX, edge } = dragState
+      const x = e.clientX - rect.left + canvasRef.current.scrollLeft
+      const { mode, startIdx, endIdx, offsetX, edge } = dragState
 
       if (mode === 'move') {
         const rawIdx = Math.round((x - offsetX) / DAY_WIDTH)
@@ -234,7 +240,8 @@ export function TimeCanvas() {
         const newEnd = newStart + duration
         setDragState((s) => (s ? { ...s, currentStart: newStart, currentEnd: newEnd } : null))
       } else {
-        const deltaX = x - startX
+        const edgeX = edge === 'left' ? startIdx * DAY_WIDTH : endIdx * DAY_WIDTH
+        const deltaX = x - edgeX
         const deltaDays = Math.sign(deltaX) * Math.round(Math.abs(deltaX) / DAY_WIDTH)
         if (edge === 'left') {
           const newStart = Math.min(endIdx - 1, Math.max(0, startIdx + deltaDays))
@@ -416,7 +423,7 @@ export function TimeCanvas() {
                   : 'text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed]'
               }`}
             >
-              {mode === 'both' ? 'Plan + Actual' : mode}
+              {mode === 'both' ? t('planActual') : t(mode === 'plan' ? 'plan' : 'actual')}
             </button>
           ))}
         </div>
@@ -428,21 +435,21 @@ export function TimeCanvas() {
             onChange={(e) => setGanttSortBy(e.target.value as GanttSortBy)}
             className="px-2 py-1 text-xs rounded-lg border border-[#e8e6dc] bg-white text-[#141413] focus:outline-none focus:border-[#3898ec]"
           >
-            <option value="earliest">Sort: Earliest task</option>
-            <option value="name">Sort: Tag name</option>
-            <option value="created_at">Sort: Created at</option>
+            <option value="earliest">{t('sortEarliest')}</option>
+            <option value="name">{t('sortName')}</option>
+            <option value="created_at">{t('sortCreated')}</option>
           </select>
           <button
             onClick={expandAllTags}
             className="px-2 py-1 text-xs rounded-lg border border-[#e8e6dc] bg-white text-[#5e5d59] hover:text-[#141413] hover:bg-[#f5f4ed] transition-colors"
           >
-            Expand all
+            {t('expandAll')}
           </button>
         </div>
 
         {/* Unscheduled tasks area */}
         <div className="px-2 py-3 border-b border-[#f0eee6]">
-          <div className="text-[11px] text-[#87867f] mb-2 uppercase tracking-[0.5px]">Inbox / Unscheduled</div>
+          <div className="text-[11px] text-[#87867f] mb-2 uppercase tracking-[0.5px]">{t('inboxUnscheduled')}</div>
           <div className="flex flex-wrap gap-2">
             {tasks
               .filter((t) => !t.planned_start && t.status !== 'done')
@@ -516,7 +523,7 @@ export function TimeCanvas() {
                     style={{ backgroundColor: group.tag?.color ?? '#87867f' }}
                   />
                   <span className="text-[11px] font-bold text-[#141413]">
-                    {group.tag?.name ?? 'Other'}
+                    {group.tag?.name ?? t('other')}
                   </span>
                   {isCollapsed && (
                     <span className="text-[10px] text-[#b0aea5]">

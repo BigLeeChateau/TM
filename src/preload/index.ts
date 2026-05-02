@@ -19,6 +19,8 @@ const api = {
     ipcRenderer.invoke('deleteTag', id),
   listTags: (): Promise<Tag[]> =>
     ipcRenderer.invoke('listTags'),
+  listSecondaryTags: (): Promise<Tag[]> =>
+    ipcRenderer.invoke('listSecondaryTags'),
 
   // Task tag associations
   listTaskTags: (taskId: number): Promise<Tag[]> =>

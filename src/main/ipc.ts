@@ -67,6 +67,15 @@ export function registerIpcHandlers(): void {
     return db.prepare('SELECT * FROM tags ORDER BY created_at DESC').all() as Tag[]
   })
 
+  ipcMain.handle('listSecondaryTags', (): Tag[] => {
+    const db = getDb()
+    return db.prepare(`
+      SELECT DISTINCT t.* FROM tags t
+      JOIN task_tags tt ON t.id = tt.tag_id
+      ORDER BY t.name
+    `).all() as Tag[]
+  })
+
   // Task tag associations
   ipcMain.handle('listTaskTags', (_event, taskId: number): Tag[] => {
     const db = getDb()

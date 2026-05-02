@@ -32,6 +32,7 @@ function savePreferences(collapsedTagIds: number[], ganttSortBy: GanttSortBy) {
 interface AppState {
   // Data
   tags: Tag[]
+  secondaryTags: Tag[]
   tasks: Task[]
   selectedTagId: number | null
   selectedStatus: TaskStatus | null
@@ -60,6 +61,7 @@ interface AppState {
   setGanttSortBy: (sort: GanttSortBy) => void
 
   loadTags: () => Promise<void>
+  loadSecondaryTags: () => Promise<void>
   loadTasks: () => Promise<void>
   createTag: (data: CreateTagInput) => Promise<Tag>
   updateTag: (id: number, data: UpdateTagInput) => Promise<void>
@@ -83,6 +85,7 @@ export const useStore = create<AppState>((set, get) => {
 
   return {
     tags: [],
+    secondaryTags: [],
     tasks: [],
     selectedTagId: null,
     selectedStatus: null,
@@ -138,6 +141,11 @@ export const useStore = create<AppState>((set, get) => {
         summaries[t.id] = result.total_seconds
       }
       set({ tagTimeSummaries: summaries })
+    },
+
+    loadSecondaryTags: async () => {
+      const secondaryTags = await window.electronAPI.listSecondaryTags()
+      set({ secondaryTags })
     },
 
     loadTasks: async () => {

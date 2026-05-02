@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useStore } from '../store'
+import { useTranslation } from '../i18n'
 import type { TaskStatus } from '../../shared/types'
 
 interface TaskModalProps {
@@ -8,7 +9,11 @@ interface TaskModalProps {
 }
 
 function nowDateString(): string {
-  return new Date().toISOString().split('T')[0]
+  const d = new Date()
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function computeDuration(start: string, end: string): number {
@@ -30,6 +35,7 @@ function formatDuration(totalSeconds: number): string {
 
 export function TaskModal({ taskId, onClose }: TaskModalProps) {
   const { tasks, tags, updateTask, deleteTask, timeEntries, loadTimeEntries, toggleTaskTimer } = useStore()
+  const { t } = useTranslation()
   const task = tasks.find((t) => t.id === taskId)
 
   const [title, setTitle] = useState('')
@@ -147,11 +153,11 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
       }}
     >
       <div className="bg-white border border-[#f0eee6] rounded-2xl w-full max-w-md p-5 shadow-[rgba(0,0,0,0.05)_0px_4px_24px] max-h-[90vh] overflow-auto">
-        <h3 className="text-lg font-medium text-[#141413] mb-4">Edit Task</h3>
+        <h3 className="text-lg font-medium text-[#141413] mb-4">{t('editTask')}</h3>
 
         <div className="space-y-3">
           <div>
-            <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Title</label>
+            <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('title')}</label>
             <input
               autoFocus
               value={title}
@@ -161,7 +167,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
           </div>
 
           <div>
-            <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Description</label>
+            <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('description')}</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -172,21 +178,21 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Status</label>
+              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('status')}</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TaskStatus)}
                 className="w-full px-3 py-2 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
               >
-                <option value="inbox">Inbox</option>
-                <option value="next">Next</option>
-                <option value="waiting">Waiting</option>
-                <option value="done">Done</option>
+                <option value="inbox">{t('status_inbox')}</option>
+                <option value="next">{t('status_next')}</option>
+                <option value="waiting">{t('status_waiting')}</option>
+                <option value="done">{t('status_done')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Major Tag</label>
+              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('majorTag')}</label>
               <select
                 value={majorTagId ?? ''}
                 onChange={(e) => {
@@ -209,7 +215,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
           </div>
 
           <div>
-            <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Secondary Tags</label>
+            <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('secondaryTags')}</label>
             <div className="flex flex-wrap gap-2">
               {tags
                 .filter((t) => t.id !== majorTagId)
@@ -242,7 +248,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                   </label>
                 ))}
               {tags.filter((t) => t.id !== majorTagId).length === 0 && (
-                <span className="text-xs text-[#b0aea5]">No other tags available</span>
+                <span className="text-xs text-[#b0aea5]">{t('noOtherTags')}</span>
               )}
             </div>
           </div>
@@ -250,7 +256,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
           {/* Planned dates */}
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Planned Start</label>
+              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('plannedStart')}</label>
               <input
                 type="date"
                 value={plannedStart}
@@ -260,7 +266,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
             </div>
 
             <div>
-              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Planned End</label>
+              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('plannedEnd')}</label>
               <input
                 type="date"
                 value={plannedEnd}
@@ -270,7 +276,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
             </div>
 
             <div>
-              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Hours</label>
+              <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('plannedHours')}</label>
               <input
                 type="number"
                 value={plannedDuration}
@@ -283,17 +289,17 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
           {/* Actual dates */}
           <div className="border-t border-[#f0eee6] pt-3">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">Actual Time</span>
+              <span className="text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">{t('actualTime')}</span>
               <div className="flex gap-2 items-center">
                 {actualStart && !actualEnd && actualDuration !== '' && (
-                  <span className="text-[11px] text-[#c96442]">{actualDuration}h elapsed</span>
+                  <span className="text-[11px] text-[#c96442]">{actualDuration}{t('elapsed')}</span>
                 )}
                 {!actualStart && (
                   <button
                     onClick={handleStartNow}
                     className="px-2 py-1 text-xs bg-[#e8e6dc] text-[#c96442] rounded-lg hover:bg-[#d1cfc5] transition-colors"
                   >
-                    Start now
+                    {t('startNow')}
                   </button>
                 )}
                 {actualStart && !actualEnd && (
@@ -301,7 +307,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                     onClick={handleMarkComplete}
                     className="px-2 py-1 text-xs bg-[#e8e6dc] text-[#c96442] rounded-lg hover:bg-[#d1cfc5] transition-colors"
                   >
-                    Mark complete
+                    {t('markComplete')}
                   </button>
                 )}
               </div>
@@ -309,7 +315,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Actual Start</label>
+                <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('actualStart')}</label>
                 <input
                   type="date"
                   value={actualStart}
@@ -319,7 +325,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
               </div>
 
               <div>
-                <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Actual End</label>
+                <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('actualEnd')}</label>
                 <input
                   type="date"
                   value={actualEnd}
@@ -329,7 +335,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
               </div>
 
               <div>
-                <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">Hours</label>
+                <label className="block text-[11px] text-[#87867f] mb-1 uppercase tracking-[0.5px]">{t('actualHours')}</label>
                 <input
                   type="number"
                   value={actualDuration}
@@ -344,7 +350,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
           <div className="border-t border-[#f0eee6] pt-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">
-                Session Log
+                {t('sessionLog')}
               </span>
               <button
                 onClick={() => toggleTaskTimer(task.id)}
@@ -354,12 +360,12 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                     : 'bg-[#e8e6dc] text-[#4d4c48] hover:bg-[#d1cfc5]'
                 }`}
               >
-                {task.timer_running ? 'Stop Timer' : 'Start Timer'}
+                {task.timer_running ? t('stopTimer') : t('startTimer')}
               </button>
             </div>
 
             {entries.length === 0 ? (
-              <p className="text-sm text-[#b0aea5]">No sessions recorded</p>
+              <p className="text-sm text-[#b0aea5]">{t('noSessions')}</p>
             ) : (
               <div className="space-y-1 max-h-32 overflow-auto">
                 {entries.map((entry) => (
@@ -375,7 +381,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                     <span className="text-[#87867f] text-xs font-mono tabular-nums">
                       {entry.ended_at && entry.duration_seconds != null
                         ? formatDuration(entry.duration_seconds)
-                        : 'Running...'}
+                        : t('running')}
                     </span>
                   </div>
                 ))}
@@ -384,7 +390,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
 
             {totalTimerSeconds > 0 && (
               <div className="mt-2 pt-2 border-t border-[#f0eee6] flex items-center justify-between">
-                <span className="text-sm font-medium text-[#4d4c48]">Total</span>
+                <span className="text-sm font-medium text-[#4d4c48]">{t('total')}</span>
                 <span className="text-sm font-medium text-[#c96442] font-mono tabular-nums">
                   {formatDuration(totalTimerSeconds)}
                 </span>
@@ -398,21 +404,21 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
             onClick={handleDelete}
             className="px-3 py-1.5 text-sm text-[#b53333] hover:text-[#b53333]/80 transition-colors"
           >
-            Delete
+            {t('delete')}
           </button>
           <div className="flex gap-2">
             <button
               onClick={onClose}
               className="px-4 py-1.5 text-sm text-[#5e5d59] hover:text-[#141413] transition-colors"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={handleSave}
               disabled={!title.trim()}
               className="px-4 py-1.5 text-sm bg-[#c96442] text-[#faf9f5] rounded-lg hover:bg-[#d97757] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Save
+              {t('save')}
             </button>
           </div>
         </div>
