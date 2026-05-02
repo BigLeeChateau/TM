@@ -149,6 +149,14 @@ export function registerIpcHandlers(): void {
       effectiveData.actual_duration = computeDuration(effectiveData.actual_start, effectiveData.actual_end)
     }
 
+    // Validate actual dates
+    const actualStartValue = effectiveData.actual_start !== undefined ? effectiveData.actual_start : oldTask.actual_start
+    const actualEndValue = effectiveData.actual_end !== undefined ? effectiveData.actual_end : oldTask.actual_end
+    const validation = validateActualDates(actualStartValue, actualEndValue)
+    if (!validation.valid) {
+      throw new Error(validation.error)
+    }
+
     for (const field of fields) {
       if (effectiveData[field] !== undefined) {
         sets.push(`${field} = ?`)
