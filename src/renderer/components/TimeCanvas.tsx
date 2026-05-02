@@ -151,8 +151,10 @@ export function TimeCanvas() {
       tag: Tag | undefined
       plannedRows: Map<number, number>
       actualRows: Map<number, number>
+      ghostRows: Map<number, number>
       maxPlannedRow: number
       maxActualRow: number
+      maxGhostRow: number
       height: number
       yOffset: number
     }
@@ -167,12 +169,21 @@ export function TimeCanvas() {
       const plannedRows = assignRows(planned, 'planned_start', 'planned_end')
       const actualRows = assignRows(actual, 'actual_start', 'actual_end')
 
+      const ghostTasks = groupTasks.filter((t) => t.planned_start && t.planned_end && !t.actual_start)
+      const ghostRows = assignRows(ghostTasks, 'planned_start', 'planned_end')
+      const maxGhost = ghostTasks.length > 0
+        ? Math.max(...ghostTasks.map((t) => ghostRows.get(t.id) ?? 0)) + 1
+        : 0
+
       const maxPlanned = planned.length > 0
         ? Math.max(...planned.map((t) => plannedRows.get(t.id) ?? 0)) + 1
         : 0
-      const maxActual = actual.length > 0
-        ? Math.max(...actual.map((t) => actualRows.get(t.id) ?? 0)) + 1
-        : 0
+      const maxActual = Math.max(
+        actual.length > 0
+          ? Math.max(...actual.map((t) => actualRows.get(t.id) ?? 0)) + 1
+          : 0,
+        maxGhost,
+      )
 
       const isCollapsed = collapsedTagIds.includes(tagId ?? -1)
       const taskHeight = isCollapsed
@@ -186,8 +197,10 @@ export function TimeCanvas() {
         tag: tagById.get(tagId ?? -1),
         plannedRows,
         actualRows,
+        ghostRows,
         maxPlannedRow: maxPlanned,
         maxActualRow: maxActual,
+        maxGhostRow: maxGhost,
         height,
         yOffset: currentYOffset,
       })
@@ -372,6 +385,33 @@ export function TimeCanvas() {
     )
   }
 
+  const renderGhostBlock = (task: Task, rowMap: Map<number, number>, rowOffset: number = 0) => {
+    const startIdx = getDayIndex(task.planned_start)
+    const endIdx = getDayIndex(task.planned_end)
+    const row = rowMap.get(task.id) ?? 0
+
+    return (
+      <div
+        key={`${task.id}-ghost`}
+        className="absolute rounded-lg px-2 py-1 text-xs font-medium select-none overflow-hidden whitespace-nowrap border border-dashed cursor-pointer transition-shadow z-10"
+        style={{
+          position: 'absolute',
+          left: startIdx * DAY_WIDTH,
+          top: rowOffset + row * (BLOCK_HEIGHT + BLOCK_GAP),
+          width: Math.max((endIdx - startIdx) * DAY_WIDTH, DAY_WIDTH),
+          height: BLOCK_HEIGHT,
+          backgroundColor: tagColor(task.major_tag_id) + '10',
+          borderColor: tagColor(task.major_tag_id) + '4d',
+          color: '#141413',
+          opacity: 0.5,
+        }}
+        onDoubleClick={() => setEditingTaskId(task.id)}
+      >
+        <span className="px-4">{task.title}</span>
+      </div>
+    )
+  }
+
   return (
     <div className="h-full overflow-auto" ref={canvasRef}>
       <div style={{ width: dayCount * DAY_WIDTH + DAY_WIDTH, minHeight: '100%' }}>
@@ -542,18 +582,31 @@ export function TimeCanvas() {
                           renderBlock(task, 'planned_start', 'planned_end', group.plannedRows, taskAreaTop)
                         )}
 
-                    {(canvasMode === 'actual' || canvasMode === 'both') &&
-                      Array.from(tasksByTag.get(group.tagId) ?? [])
-                        .filter((t) => t.actual_start && t.actual_end)
-                        .map((task) =>
-                          renderBlock(
-                            task,
-                            'actual_start',
-                            'actual_end',
-                            group.actualRows,
-                            taskAreaTop + group.maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP)
-                          )
-                        )}
+                    {(canvasMode === 'actual' || canvasMode === 'both') && (
+                      <>
+                        {Array.from(tasksByTag.get(group.tagId) ?? [])
+                          .filter((t) => t.actual_start && t.actual_end)
+                          .map((task) =>
+                            renderBlock(
+                              task,
+                              'actual_start',
+                              'actual_end',
+                              group.actualRows,
+                              taskAreaTop + group.maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP)
+                            )
+                          )}
+                        {/* Ghost blocks for planned-but-not-started tasks */}
+                        {Array.from(tasksByTag.get(group.tagId) ?? [])
+                          .filter((t) => t.planned_start && t.planned_end && !t.actual_start)
+                          .map((task) =>
+                            renderGhostBlock(
+                              task,
+                              group.ghostRows,
+                              taskAreaTop + group.maxPlannedRow * (BLOCK_HEIGHT + BLOCK_GAP)
+                            )
+                          )}
+                      </>
+                    )}
                   </>
                 )}
               </div>
