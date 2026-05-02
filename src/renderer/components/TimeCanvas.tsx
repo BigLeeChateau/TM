@@ -196,7 +196,7 @@ export function TimeCanvas() {
 
   // ---- Drag handlers (only for planned blocks in plan/both mode) ----
   const handleMouseDown = useCallback(
-    (e: ReactMouseEvent, task: Task, mode: 'move' | 'resize', startField: 'planned_start' | 'actual_start', endField: 'planned_end' | 'actual_end') => {
+    (e: ReactMouseEvent, task: Task, mode: 'move' | 'resize', startField: 'planned_start' | 'actual_start', endField: 'planned_end' | 'actual_end', edge?: 'left' | 'right') => {
       e.preventDefault()
       const rect = canvasRef.current?.getBoundingClientRect()
       if (!rect) return
@@ -206,6 +206,7 @@ export function TimeCanvas() {
       setDragState({
         taskId: task.id,
         mode,
+        edge,
         startField,
         endField,
         startX,
@@ -540,6 +541,7 @@ type GanttSortBy = 'earliest' | 'name' | 'created_at'
 interface DragState {
   taskId: number
   mode: 'move' | 'resize'
+  edge?: 'left' | 'right'
   startField: 'planned_start' | 'actual_start'
   endField: 'planned_end' | 'actual_end'
   startX: number
