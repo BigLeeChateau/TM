@@ -258,11 +258,16 @@ export function TimeCanvas() {
             [startField]: newStartDate,
             [endField]: newEndDate,
           } as UpdateTaskInput)
-        } else if (mode === 'resize' && currentEnd !== undefined) {
-          const newEndDate = getDateFromIndex(currentEnd)
-          await updateTask(taskId, {
-            [endField]: newEndDate,
-          } as UpdateTaskInput)
+        } else if (mode === 'resize') {
+          if (currentStart !== undefined) {
+            await updateTask(taskId, {
+              [startField]: getDateFromIndex(currentStart),
+            } as UpdateTaskInput)
+          } else if (currentEnd !== undefined) {
+            await updateTask(taskId, {
+              [endField]: getDateFromIndex(currentEnd),
+            } as UpdateTaskInput)
+          }
         }
       }
       setDragState(null)
