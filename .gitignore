@@ -10,7 +10,16 @@ docs/
 CLAUDE.md
 DESIGN.md
 TODOS.md
+
+# Development screenshots
+verification-*.png
+after-*.png
+centered-*.png
 canvas-*.png
 redesign-*.png
 timer-test-*.png
 tm-fresh-state.png
+current-state.png
+new-task-form.png
+overlapping-task-result.png
+task-modal.png
