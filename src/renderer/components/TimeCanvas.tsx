@@ -302,12 +302,10 @@ export function TimeCanvas() {
     let width = (endIdx - startIdx) * DAY_WIDTH
 
     if (dragState && dragState.taskId === task.id && startKey === dragState.startField) {
-      if (dragState.currentStart !== undefined) {
-        left = dragState.currentStart * DAY_WIDTH
-        width = (dragState.currentEnd! - dragState.currentStart) * DAY_WIDTH
-      } else if (dragState.currentEnd !== undefined) {
-        width = (dragState.currentEnd - startIdx) * DAY_WIDTH
-      }
+      const newStart = dragState.currentStart ?? startIdx
+      const newEnd = dragState.currentEnd ?? endIdx
+      left = newStart * DAY_WIDTH
+      width = (newEnd - newStart) * DAY_WIDTH
     }
 
     return {
