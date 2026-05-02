@@ -21,10 +21,10 @@ function saveMockData() {
 }
 
 const initial = loadMockData()
-let mockTags: Tag[] = initial.tags
-let mockTasks: Task[] = initial.tasks
-let nextTagId = initial.nextTagId
-let nextTaskId = initial.nextTaskId
+let mockTags: Tag[] = initial.tags ?? []
+let mockTasks: Task[] = initial.tasks ?? []
+let nextTagId = initial.nextTagId ?? 1
+let nextTaskId = initial.nextTaskId ?? 1
 let mockTimeEntries: TimeEntry[] = initial.timeEntries ?? []
 let nextTimeEntryId = initial.nextTimeEntryId ?? 1
 
