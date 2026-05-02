@@ -329,12 +329,25 @@ export function TimeCanvas() {
         onMouseDown={(e) => handleMouseDown(e, task, 'move', startField, endField)}
         onDoubleClick={() => setEditingTaskId(task.id)}
       >
-        <span>{task.title}</span>
+        {/* Left resize handle */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-4 cursor-ew-resize flex items-center justify-center group"
+          onMouseDown={(e) => {
+            e.stopPropagation()
+            handleMouseDown(e, task, 'resize', startField, endField, 'left')
+          }}
+        >
+          <div className="w-[3px] h-4 rounded-full bg-current opacity-0 group-hover:opacity-30 transition-opacity" />
+        </div>
+
+        <span className="px-4">{task.title}</span>
+
+        {/* Right resize handle */}
         <div
           className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize flex items-center justify-center group"
           onMouseDown={(e) => {
             e.stopPropagation()
-            handleMouseDown(e, task, 'resize', startField, endField)
+            handleMouseDown(e, task, 'resize', startField, endField, 'right')
           }}
         >
           <div className="w-[3px] h-4 rounded-full bg-current opacity-0 group-hover:opacity-30 transition-opacity" />
