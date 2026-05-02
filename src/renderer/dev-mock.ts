@@ -151,7 +151,7 @@ function updateTask(id: number, data: UpdateTaskInput): Promise<Task> {
 
   Object.assign(t, effectiveData)
   saveMockData()
-  return Promise.resolve(t)
+  return Promise.resolve({ ...t })
 }
 
 function deleteTask(id: number): Promise<void> {
@@ -224,7 +224,7 @@ function toggleTaskTimer(taskId: number): Promise<Task> {
     t.timer_started_at = new Date().toISOString()
   }
   saveMockData()
-  return Promise.resolve(t)
+  return Promise.resolve({ ...t })
 }
 
 function listTimeEntries(taskId: number): Promise<TimeEntry[]> {

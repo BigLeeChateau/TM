@@ -50,6 +50,7 @@ export const de = {
   cancel: 'Abbrechen',
   save: 'Speichern',
   elapsed: 'h vergangen',
+  actualStartLocked: 'Durch Timer gesperrt',
 
   // TimeCanvas
   planActual: 'Plan + Tatsächlich',

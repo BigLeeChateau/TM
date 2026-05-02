@@ -50,6 +50,7 @@ export const zh = {
   cancel: '取消',
   save: '保存',
   elapsed: '小时已过去',
+  actualStartLocked: '已由计时器锁定',
 
   // TimeCanvas
   planActual: '计划 + 实际',

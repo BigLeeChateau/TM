@@ -50,6 +50,7 @@ export const fr = {
   cancel: 'Annuler',
   save: 'Enregistrer',
   elapsed: 'h écoulées',
+  actualStartLocked: 'Verrouillé par le minuteur',
 
   // TimeCanvas
   planActual: 'Plan + Réel',

@@ -50,6 +50,7 @@ export const es = {
   cancel: 'Cancelar',
   save: 'Guardar',
   elapsed: 'h transcurridas',
+  actualStartLocked: 'Bloqueado por temporizador',
 
   // TimeCanvas
   planActual: 'Plan + Real',

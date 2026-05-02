@@ -50,6 +50,7 @@ export const ja = {
   cancel: 'キャンセル',
   save: '保存',
   elapsed: '時間経過',
+  actualStartLocked: 'タイマーでロックされています',
 
   // TimeCanvas
   planActual: '予定 + 実績',

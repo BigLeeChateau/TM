@@ -50,6 +50,7 @@ export const ru = {
   cancel: 'Отмена',
   save: 'Сохранить',
   elapsed: 'ч прошло',
+  actualStartLocked: 'Заблокировано таймером',
 
   // TimeCanvas
   planActual: 'План + Факт',
