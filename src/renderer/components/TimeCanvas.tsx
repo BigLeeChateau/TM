@@ -50,10 +50,9 @@ export function TimeCanvas() {
     return `${year}-${month}-${day}`
   }
 
-  // ---- Row assignment for overlap avoidance ----
-  function assignRows(tasksToLayout: Task[], startKey: keyof Task, endKey: keyof Task): Map<number, number> {
+  // ---- Row assignment: each task gets its own row ----
+  function assignRows(tasksToLayout: Task[], startKey: keyof Task, _endKey: keyof Task): Map<number, number> {
     const rows = new Map<number, number>()
-    const rowEnds: number[] = []
 
     const sorted = [...tasksToLayout].sort((a, b) => {
       const ai = getDayIndex(a[startKey] as string | null)
@@ -61,16 +60,12 @@ export function TimeCanvas() {
       return ai - bi
     })
 
-    for (const task of sorted) {
+    for (let i = 0; i < sorted.length; i++) {
+      const task = sorted[i]
       const startIdx = getDayIndex(task[startKey] as string | null)
-      const endIdx = getDayIndex(task[endKey] as string | null)
+      const endIdx = getDayIndex(task[_endKey] as string | null)
       if (startIdx < 0 || endIdx < 0) continue
-      let row = 0
-      while (rowEnds[row] !== undefined && rowEnds[row] > startIdx) {
-        row++
-      }
-      rows.set(task.id, row)
-      rowEnds[row] = endIdx
+      rows.set(task.id, i)
     }
 
     return rows
@@ -346,7 +341,7 @@ export function TimeCanvas() {
     return (
       <div
         key={`${task.id}-${String(startKey)}`}
-        className={`absolute rounded-lg px-2 py-1 text-xs font-medium select-none cursor-move overflow-hidden whitespace-nowrap border transition-shadow ${
+        className={`absolute rounded-lg py-1 px-5 text-xs font-medium select-none cursor-move overflow-hidden whitespace-nowrap border transition-shadow flex items-center ${
           task.status === 'done' ? 'opacity-40' : ''
         } ${isDragging ? 'shadow-lg z-20' : 'z-10'}`}
         style={{
@@ -355,6 +350,7 @@ export function TimeCanvas() {
           borderColor: tagColor(task.major_tag_id) + (isPlanned ? '40' : 'ff'),
           color: isPlanned ? '#141413' : '#faf9f5',
         }}
+        title={task.title}
         onMouseDown={(e) => handleMouseDown(e, task, 'move', startField, endField)}
         onDoubleClick={() => setEditingTaskId(task.id)}
       >
@@ -369,7 +365,7 @@ export function TimeCanvas() {
           <div className="w-[3px] h-4 rounded-full bg-current opacity-0 group-hover:opacity-30 transition-opacity" />
         </div>
 
-        <span className="px-4">{task.title}</span>
+        <span className="truncate min-w-0 text-center w-full">{task.title}</span>
 
         {/* Right resize handle */}
         <div
@@ -393,7 +389,7 @@ export function TimeCanvas() {
     return (
       <div
         key={`${task.id}-ghost`}
-        className="absolute rounded-lg px-2 py-1 text-xs font-medium select-none overflow-hidden whitespace-nowrap border border-dashed cursor-pointer transition-shadow z-10"
+        className="absolute rounded-lg py-1 px-5 text-xs font-medium select-none overflow-hidden whitespace-nowrap border border-dashed cursor-pointer transition-shadow z-10 flex items-center"
         style={{
           position: 'absolute',
           left: startIdx * DAY_WIDTH,
@@ -405,9 +401,10 @@ export function TimeCanvas() {
           color: '#141413',
           opacity: 0.5,
         }}
+        title={task.title}
         onDoubleClick={() => setEditingTaskId(task.id)}
       >
-        <span className="px-4">{task.title}</span>
+        <span className="truncate min-w-0 text-center w-full">{task.title}</span>
       </div>
     )
   }
