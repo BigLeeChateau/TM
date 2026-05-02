@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useStore } from '../store'
 import { useTranslation } from '../i18n'
+import { getTodayLocal, validateActualDates } from '../../shared/actual-date-utils'
 import type { TaskStatus } from '../../shared/types'
 
 interface TaskModalProps {
@@ -49,6 +50,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
   const [actualStart, setActualStart] = useState('')
   const [actualEnd, setActualEnd] = useState('')
   const [actualDuration, setActualDuration] = useState<number | ''>('')
+  const [validationError, setValidationError] = useState<string | null>(null)
   const [timerTick, setTimerTick] = useState(0)
 
   useEffect(() => {
@@ -107,6 +109,16 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
   void timerTick
 
   const handleSave = async () => {
+    const validation = validateActualDates(
+      actualStart || null,
+      actualEnd || null,
+    )
+    if (!validation.valid) {
+      setValidationError(validation.error!)
+      return
+    }
+    setValidationError(null)
+
     await updateTask(task.id, {
       title: title.trim(),
       description: description.trim(),
@@ -119,7 +131,6 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
       actual_end: actualEnd || null,
       actual_duration: actualDuration ? Number(actualDuration) : null,
     })
-    // Sync secondary tags (exclude major tag)
     const secondaryIds = secondaryTagIds.filter((id) => id !== majorTagId)
     await window.electronAPI.setTaskTags(task.id, secondaryIds)
     onClose()
@@ -288,6 +299,9 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
 
           {/* Actual dates */}
           <div className="border-t border-[#f0eee6] pt-3">
+            {validationError && (
+              <div className="text-[11px] text-[#b53333] mb-2">{validationError}</div>
+            )}
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-medium text-[#87867f] uppercase tracking-[0.5px]">{t('actualTime')}</span>
               <div className="flex gap-2 items-center">
@@ -319,9 +333,17 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                 <input
                   type="date"
                   value={actualStart}
-                  onChange={(e) => setActualStart(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
+                  max={getTodayLocal()}
+                  readOnly={!!task.actual_start}
+                  onChange={(e) => {
+                    setActualStart(e.target.value)
+                    setValidationError(null)
+                  }}
+                  className={`w-full px-3 py-2 border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5] ${task.actual_start ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                 />
+                {task.actual_start && (
+                  <span className="text-[10px] text-[#87867f] mt-0.5">{t('actualStartLocked')}</span>
+                )}
               </div>
 
               <div>
@@ -329,7 +351,11 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
                 <input
                   type="date"
                   value={actualEnd}
-                  onChange={(e) => setActualEnd(e.target.value)}
+                  max={getTodayLocal()}
+                  onChange={(e) => {
+                    setActualEnd(e.target.value)
+                    setValidationError(null)
+                  }}
                   className="w-full px-3 py-2 bg-white border border-[#e8e6dc] rounded-xl text-sm text-[#141413] focus:outline-none focus:border-[#3898ec] placeholder:text-[#b0aea5]"
                 />
               </div>
@@ -415,7 +441,7 @@ export function TaskModal({ taskId, onClose }: TaskModalProps) {
             </button>
             <button
               onClick={handleSave}
-              disabled={!title.trim()}
+              disabled={!title.trim() || !!validationError}
               className="px-4 py-1.5 text-sm bg-[#c96442] text-[#faf9f5] rounded-lg hover:bg-[#d97757] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {t('save')}
