@@ -1,4 +1,5 @@
 import type { Tag, Task, CreateTagInput, UpdateTagInput, CreateTaskInput, UpdateTaskInput, TimeEntry } from '../shared/types'
+import { validateActualDates, computeActualDatesFromTimer } from '../shared/actual-date-utils'
 
 function loadMockData() {
   try {
@@ -141,6 +142,13 @@ function updateTask(id: number, data: UpdateTaskInput): Promise<Task> {
     effectiveData.actual_duration = computeDuration(effectiveData.actual_start, effectiveData.actual_end)
   }
 
+  const actualStartValue = effectiveData.actual_start !== undefined ? effectiveData.actual_start : t.actual_start
+  const actualEndValue = effectiveData.actual_end !== undefined ? effectiveData.actual_end : t.actual_end
+  const validation = validateActualDates(actualStartValue, actualEndValue)
+  if (!validation.valid) {
+    throw new Error(validation.error)
+  }
+
   Object.assign(t, effectiveData)
   saveMockData()
   return Promise.resolve(t)
@@ -194,6 +202,12 @@ function toggleTaskTimer(taskId: number): Promise<Task> {
       entry.ended_at = now.toISOString()
       entry.duration_seconds = elapsed
       t.timer_accumulated += elapsed
+
+      // Auto-set actual dates
+      const { actual_start, actual_end } = computeActualDatesFromTimer(entry.started_at, now.toISOString())
+      t.actual_start = actual_start
+      t.actual_end = actual_end
+      t.actual_duration = computeDuration(actual_start, actual_end)
     }
     t.timer_running = 0
     t.timer_started_at = null
